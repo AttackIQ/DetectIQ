@@ -106,7 +106,6 @@ token-check: ## Check if PyPI token is configured
 	@if poetry config pypi-token.pypi 2>/dev/null | grep -q "."; then \
 		echo "✓ PyPI token found"; \
 	else \
-		# Try with keyring as fallback - requires keyrings.alt package for some environments
 		if python -c "import keyring; keyring.get_password('pypi-token', 'pypi') and print('Token found')" 2>/dev/null | grep -q "Token found"; then \
 			echo "✓ PyPI token found (in keyring)"; \
 		else \
