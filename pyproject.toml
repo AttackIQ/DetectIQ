@@ -17,6 +17,11 @@ exclude = [
     "**/node_modules", "**/node_modules/**/*",
     "dist", "build"
 ]
+# Include documentation and images
+include = [
+    "docs/images/*.png",
+    "docs/*.md"
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",

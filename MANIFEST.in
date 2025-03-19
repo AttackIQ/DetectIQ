@@ -3,6 +3,10 @@ include README.md
 include requirements/*.txt
 include .env.example
 
+# Include documentation and images
+recursive-include docs/images *.png
+recursive-include docs *.md
+
 # Only include core modules and necessary utilities
 recursive-include detectiq/core *
 recursive-include detectiq/globals.py
