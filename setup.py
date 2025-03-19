@@ -5,18 +5,11 @@ from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 
-def build_frontend():
-    """Build frontend as part of package installation."""
-    script_path = os.path.join("detectiq", "scripts", "build_frontend.py")
-    if os.path.exists(script_path):
-        subprocess.run(["python", script_path], check=True)
-
-
+# Remove frontend build functionality since we're not including webapp
 class CustomInstallCommand(install):
-    """Custom install command to build frontend."""
+    """Custom install command."""
 
     def run(self):
-        build_frontend()
         super().run()
 
 
@@ -68,7 +61,7 @@ setup(
         "Documentation": "https://github.com/AttackIQ/DetectIQ",
         "Source Code": "https://github.com/AttackIQ/DetectIQ",
     },
-    packages=find_packages(),
+    packages=find_packages(include=['detectiq', 'detectiq.core*'], exclude=['detectiq.webapp*']),
     install_requires=core_requirements,
     extras_require={
         "splunk": splunk_requirements,
@@ -89,7 +82,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Information Technology",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: LGPL License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
@@ -103,6 +96,6 @@ setup(
     },
     include_package_data=True,
     package_data={
-        "detectiq": ["webapp/backend/static/*"],
+        "detectiq": ["core/**/*"],
     },
 )

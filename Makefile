@@ -59,17 +59,13 @@ start/frontend: ## Start the frontend development server
 run/local: start/backend start/frontend ## Run both backend and frontend servers
 	@echo "\033[1;33m[*] Running '$(APP_NAME)'\033[0m"
 
-.PHONY: format
-format: ## Format Python files using black
-	@echo "Formatting Python files..."
+.PHONY: format-ruff
+format-ruff: ## Run code formatting and linting
+	@echo "Formatting Python files with black..."
 	poetry run black $(PYTHON_FILES)
-
-.PHONY: ruff
-ruff: ## Run Ruff linter
 	@echo "Running Ruff linter..."
-	@# Use the pre-filtered PYTHON_FILES list that excludes node_modules
 	poetry run ruff check $(PYTHON_FILES) || true
-	@echo "Note: Linting only checks project files, not third-party code."
+	@echo "Formatting and linting completed"
 
 .PHONY: install-dev
 install-dev: lock ## Install development dependencies
@@ -92,9 +88,16 @@ clean: ## Clean up python cache files and build artifacts
 	rm -rf .pytest_cache/ .ruff_cache/ .coverage htmlcov/ .mypy_cache/ .tox/ 2>/dev/null || true
 
 .PHONY: build
-build: ## Build the package using poetry
-	@echo "Building package..."
-	poetry build
+build: safety-check clean ## Build the package (core-only, without webapp components)
+	@echo "Building core-only package..."
+	@echo "Checking package configuration..."
+	@grep -q "detectiq/webapp" pyproject.toml || { echo "Error: webapp exclusion not found in pyproject.toml"; exit 1; }
+	@grep -q "detectiq/webapp" MANIFEST.in || { echo "Error: webapp exclusion not found in MANIFEST.in"; exit 1; }
+	@echo "Configuration looks good, building package..."
+	python -m build
+	@echo "Checking built package contents (shouldn't contain webapp)..."
+	unzip -l dist/*.whl | grep "detectiq/webapp" && { echo "Error: Package still contains webapp files!"; exit 1; } || echo "✓ No webapp files found in package."
+	@echo "Core-only package built successfully."
 
 .PHONY: token-check
 token-check: ## Check if PyPI token is configured
@@ -131,12 +134,10 @@ publish: token-check safety-check ## Publish to PyPI
 	@echo "Publishing package to PyPI..."
 	poetry publish
 
-.PHONY: format-ruff
-format-ruff: format ruff ## Run format and ruff commands 
-
-.PHONY: format-all
-format-all: format ruff ## Run all code formatting and linting commands (alias for format-ruff)
-	@echo "All formatting and linting completed"
+.PHONY: poetry-build
+poetry-build: ## Build full package using poetry (includes webapp)
+	@echo "Building full package using poetry (includes webapp)..."
+	poetry build
 
 .PHONY: version
 version: ## Display current version

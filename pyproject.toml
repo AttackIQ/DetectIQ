@@ -8,8 +8,15 @@ packages = [{include = "detectiq"}]
 license = "LGPL-2.1"
 repository = "https://github.com/AttackIQ/DetectIQ"
 keywords = ["security", "detection", "sigma", "yara", "snort", "llm"]
-# Explicitly exclude .env files from package
-exclude = [".env", "**/.env", ".env.*", "**/.env.*"]
+# Package configuration: Core-only by default (no webapp components)
+# Explicitly exclude .env files and webapp components from package
+exclude = [
+    ".env", "**/.env", ".env.*", "**/.env.*",
+    "detectiq/webapp", "detectiq/webapp/**/*",
+    "detectiq/manage.py", "detectiq/setup.py", 
+    "**/node_modules", "**/node_modules/**/*",
+    "dist", "build"
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",

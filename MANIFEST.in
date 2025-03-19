@@ -2,10 +2,26 @@ include LICENSE
 include README.md
 include requirements/*.txt
 include .env.example
-recursive-include detectiq *
+
+# Only include core modules and necessary utilities
+recursive-include detectiq/core *
+recursive-include detectiq/globals.py
+recursive-include detectiq/__init__.py
+
+# Explicitly exclude webapp code
+recursive-exclude detectiq/webapp *
+exclude detectiq/manage.py
+exclude detectiq/setup.py
+recursive-exclude detectiq/requirements.txt
+
+# Exclude Python cache files
 recursive-exclude detectiq/__pycache__ *
 recursive-exclude detectiq/**/__pycache__ *
+
+# Exclude test files
 recursive-exclude tests *
+
+# Exclude build and development files
 recursive-exclude .venv *
 recursive-exclude dist *
 recursive-exclude build *
@@ -13,6 +29,10 @@ recursive-exclude .git *
 recursive-exclude .github *
 recursive-exclude .vscode *
 recursive-exclude .idea *
+
+# Exclude all node_modules
+recursive-exclude **/node_modules *
+
 # Explicitly exclude all .env files except the example
 exclude .env
 exclude .env.*
