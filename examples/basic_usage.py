@@ -8,9 +8,15 @@ This example demonstrates:
 3. Translating Sigma rules to different formats
 
 To use this example:
-1. Copy this file to your project
-2. Create a .env file with your OpenAI API key
-3. Run: python basic_usage.py
+1. Create and activate a virtual environment:
+   python -m venv venv && source venv/bin/activate
+   
+2. Install DetectIQ:
+   pip install -r requirements.txt
+   
+3. Configure OpenAI API key in .env file
+   
+4. Run: python basic_usage.py
 """
 import os
 import asyncio

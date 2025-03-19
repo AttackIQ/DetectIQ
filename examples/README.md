@@ -20,10 +20,10 @@ This directory contains examples demonstrating how to use the DetectIQ package.
 
 2. Install dependencies:
    ```bash
-   # If you want to install from PyPI:
-   pip install detectiq
+   # Using requirements.txt (simplest approach)
+   pip install -r requirements.txt
    
-   # Or if you want to install from local repository (development):
+   # Alternatively, if you want to install from local repository (development):
    cd .. # Navigate to the root directory of the repo
    pip install -e .
    ```
@@ -68,15 +68,15 @@ Examples showing how to analyze files and network traffic for rule creation:
 
 ## Dependencies
 
-All examples require the following dependencies, which are **automatically installed** when you install the DetectIQ package:
-- langchain, langchain-openai, langchain-community
+All examples use the DetectIQ package, which automatically installs all required dependencies:
+- langchain and related packages
 - openai
 - faiss-cpu
 - yara-python
 - sigmaiq
-- and other dependencies
+- and other security and ML-related libraries
 
-You only need to run `pip install detectiq` (or `pip install -e .` for development) and everything will be set up automatically.
+The provided `requirements.txt` file installs DetectIQ and all its dependencies.
 
 ## Usage with Installed Package
 
