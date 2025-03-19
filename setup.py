@@ -97,5 +97,6 @@ setup(
     include_package_data=True,
     package_data={
         "detectiq": ["core/**/*"],
+        "": ["docs/images/*.png", "README.md", "docs/*.md"],
     },
 )

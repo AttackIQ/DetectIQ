@@ -180,7 +180,26 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-For more detailed examples, see the [examples](examples/) directory.
+### Accessing Documentation Resources
+
+The package includes documentation resources like screenshots and images that you can use in your own applications:
+
+```python
+from detectiq.documentation import list_images, get_image_path
+
+# List all available images
+available_images = list_images()
+print(available_images.keys())  # Shows names like 'rules_page', 'yara_rule_creation_1', etc.
+
+# Get path to a specific image
+rules_page_image = get_image_path('rules_page')
+print(f"Rules page image path: {rules_page_image}")
+
+# Use the image in your application
+# For example, with a GUI toolkit or in documentation
+```
+
+For more detailed examples, see the [examples](examples/) directory, particularly [examples/use_documentation.py](examples/use_documentation.py).
 
 For instructions on publishing the package to PyPI, see [PUBLISHING.md](PUBLISHING.md).
 
