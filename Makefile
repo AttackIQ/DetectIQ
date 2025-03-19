@@ -146,7 +146,14 @@ publish: token-check _safety-check ## Publish to PyPI using twine
 	@echo "Checking package with twine..."
 	twine check dist/*
 	@echo "Publishing to PyPI..."
-	twine upload dist/*
+	@TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
+	if [ -n "$$TOKEN" ]; then \
+		echo "Using token from keyring"; \
+		twine upload dist/* --non-interactive --username __token__ --password "$$TOKEN"; \
+	else \
+		echo "Token not found in keyring, prompting for manual entry"; \
+		twine upload dist/*; \
+	fi
 
 .PHONY: version
 version: ## Display current version
@@ -199,7 +206,14 @@ test-publish: token-check _safety-check ## Publish to TestPyPI
 	@echo "Checking package with twine..."
 	twine check dist/*
 	@echo "Publishing to TestPyPI..."
-	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	@TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
+	if [ -n "$$TOKEN" ]; then \
+		echo "Using token from keyring"; \
+		twine upload --repository-url https://test.pypi.org/legacy/ dist/* --non-interactive --username __token__ --password "$$TOKEN"; \
+	else \
+		echo "Token not found in keyring, prompting for manual entry"; \
+		twine upload --repository-url https://test.pypi.org/legacy/ dist/*; \
+	fi
 
 .PHONY: _safety-check
 _safety-check:
