@@ -2,9 +2,26 @@
 name = "detectiq"
 version = "0.1.0"
 description = "A detection engineering workbench with LLM capabilities"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["AttackIQ <rajesh.sharma@attackiq.com>"]
 readme = "README.md"
 packages = [{include = "detectiq"}]
+license = "LGPL-2.1"
+repository = "https://github.com/AttackIQ/DetectIQ"
+keywords = ["security", "detection", "sigma", "yara", "snort", "llm"]
+# Explicitly exclude .env files from package
+exclude = [".env", "**/.env", ".env.*", "**/.env.*"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 
 
 [tool.poetry.dependencies]

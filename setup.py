@@ -51,9 +51,23 @@ dev_requirements = [
     "mypy>=1.0.0",
 ]
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name="detectiq",
     version="0.1.0",
+    author="AttackIQ",
+    author_email="rajesh.sharma@attackiq.com",
+    description="A detection engineering workbench with LLM capabilities",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/AttackIQ/DetectIQ",
+    project_urls={
+        "Bug Tracker": "https://github.com/AttackIQ/DetectIQ/issues",
+        "Documentation": "https://github.com/AttackIQ/DetectIQ",
+        "Source Code": "https://github.com/AttackIQ/DetectIQ",
+    },
     packages=find_packages(),
     install_requires=core_requirements,
     extras_require={
@@ -71,6 +85,19 @@ setup(
             + dev_requirements
         ),
     },
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Topic :: Security",
+    ],
+    python_requires=">=3.9",
     cmdclass={
         "install": CustomInstallCommand,
     },

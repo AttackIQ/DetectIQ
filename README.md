@@ -7,6 +7,9 @@ DetectIQ is an AI-powered security rule management platform that helps create, a
 - [Current Features](#current-features)
 - [Road Map](#road-map)
 - [Screenshots](#screenshots)
+- [Using as a Package](#using-as-a-package)
+- [Environment Configuration](#environment-configuration)
+- [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
 - [Support & Community](#support--community)
@@ -121,6 +124,129 @@ bash start.sh run
   <em>About Page</em>
   <img src="docs/images/detectiq_about.png" alt="About Page"/>
 </p>
+
+## Using as a Package
+
+DetectIQ can be installed as a Python package from PyPI:
+
+```bash
+pip install detectiq
+```
+
+This allows you to leverage DetectIQ's detection rule management capabilities in your own Python projects:
+
+```python
+import asyncio
+from typing import cast
+import os
+
+# Set OpenAI API key
+os.environ["OPENAI_API_KEY"] = "your-api-key"
+
+from langchain.schema.language_model import BaseLanguageModel
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from detectiq.core.llm.yara_rules import YaraLLM
+from detectiq.core.llm.toolkits.base import create_rule_agent
+from detectiq.core.llm.toolkits.yara_toolkit import YaraToolkit
+
+async def main():
+    # Initialize LLMs
+    agent_llm = cast(BaseLanguageModel, ChatOpenAI(temperature=0, model="gpt-4o"))
+    rule_creation_llm = cast(BaseLanguageModel, ChatOpenAI(temperature=0, model="gpt-4o"))
+    
+    # Initialize YARA tools
+    yara_llm = YaraLLM(
+        embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+        agent_llm=agent_llm,
+        rule_creation_llm=rule_creation_llm,
+        rule_dir="./rules",
+        vector_store_dir="./vectorstore",
+    )
+    
+    # Create agent
+    yara_agent = create_rule_agent(
+        rule_type="yara",
+        vectorstore=yara_llm.vectordb,
+        rule_creation_llm=yara_llm.rule_creation_llm,
+        agent_llm=yara_llm.agent_llm,
+        toolkit_class=YaraToolkit,
+    )
+    
+    # Create a rule
+    result = await yara_agent.ainvoke({"input": "Create a YARA rule to detect ransomware"})
+    print(result.get("output"))
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+For more detailed examples, see the [examples](examples/) directory.
+
+For instructions on publishing the package to PyPI, see [PUBLISHING.md](PUBLISHING.md).
+
+## Environment Configuration
+
+DetectIQ uses environment variables for configuration. A comprehensive example with documentation is provided in [.env.example](.env.example).
+
+To configure the application:
+
+1. Copy the example file to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file with your specific settings:
+   ```bash
+   # Required for LLM functionality
+   OPENAI_API_KEY=your-api-key-here
+   
+   # Optional configurations
+   LOG_LEVEL=INFO
+   DEBUG=False
+   ```
+
+3. The same `.env` file can be used for both the web application and the examples.
+
+## Development
+
+DetectIQ includes a comprehensive Makefile to assist with development, testing, and publishing tasks.
+
+### Makefile Commands
+
+To view all available commands:
+
+```bash
+make help
+```
+
+#### Common Development Commands
+
+```bash
+# Installation
+make install/local         # Complete local installation (backend + frontend)
+
+# Running the application
+make run/local             # Run both backend and frontend servers
+
+# Code quality
+make format               # Format Python files using black
+make ruff                 # Run Ruff linter
+make test                 # Run tests with coverage
+
+# Package management
+make update               # Update dependencies
+make version              # Display current version
+make version-patch        # Bump patch version (0.0.X)
+make version-minor        # Bump minor version (0.X.0)
+make version-major        # Bump major version (X.0.0)
+
+# PyPI publishing
+make pypi-build           # Build package for PyPI
+make pypi-check           # Check package with twine
+make pypi-publish         # Publish to PyPI
+```
+
+For more details on publishing the package, see [PUBLISHING.md](PUBLISHING.md).
 
 ## Contributing
 1. Fork the repository

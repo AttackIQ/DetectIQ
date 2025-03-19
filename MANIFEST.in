@@ -1,0 +1,21 @@
+include LICENSE
+include README.md
+include requirements/*.txt
+include .env.example
+recursive-include detectiq *
+recursive-exclude detectiq/__pycache__ *
+recursive-exclude detectiq/**/__pycache__ *
+recursive-exclude tests *
+recursive-exclude .venv *
+recursive-exclude dist *
+recursive-exclude build *
+recursive-exclude .git *
+recursive-exclude .github *
+recursive-exclude .vscode *
+recursive-exclude .idea *
+# Explicitly exclude all .env files except the example
+exclude .env
+exclude .env.*
+exclude **/.env
+exclude **/.env.*
+include .env.example 
