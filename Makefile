@@ -102,12 +102,21 @@ build: safety-check clean ## Build the package (core-only, without webapp compon
 .PHONY: token-check
 token-check: ## Check if PyPI token is configured
 	@echo "Checking PyPI token configuration..."
-	@if ! python -c "import keyring; token = keyring.get_password('pypi-token', 'pypi'); exit(0 if token else 1)"; then \
-		echo "PyPI token not configured. Please run:"; \
-		echo "make token-set TOKEN=your-token-here"; \
-		exit 1; \
-	else \
+	@# First check using poetry config, but suppress error messages
+	@if poetry config pypi-token.pypi 2>/dev/null | grep -q "."; then \
 		echo "✓ PyPI token found"; \
+	else \
+		# Try with keyring as fallback - requires keyrings.alt package for some environments
+		if python -c "import keyring; keyring.get_password('pypi-token', 'pypi') and print('Token found')" 2>/dev/null | grep -q "Token found"; then \
+			echo "✓ PyPI token found (in keyring)"; \
+		else \
+			echo "PyPI token not configured. Please run:"; \
+			echo "make token-set TOKEN=your-token-here"; \
+			echo ""; \
+			echo "If you encounter keyring errors, install keyrings.alt:"; \
+			echo "pip install keyrings.alt"; \
+			exit 1; \
+		fi \
 	fi
 
 .PHONY: token-set
@@ -118,14 +127,16 @@ token-set: ## Set PyPI token (Usage: make token-set TOKEN=your-token-here)
 	fi
 	@echo "Setting PyPI token..."
 	@poetry config pypi-token.pypi "$(TOKEN)"
-	@python -c "import keyring; keyring.set_password('pypi-token', 'pypi', '$(TOKEN)')" 2>/dev/null || echo "Warning: Could not store in keyring"
+	@# Try to store in keyring but don't fail if it doesn't work
+	@python -c "import keyring; keyring.set_password('pypi-token', 'pypi', '$(TOKEN)')" 2>/dev/null || echo "Note: Token stored in poetry config only (keyring backend not available)"
 	@echo "Token configured successfully"
 
 .PHONY: token-remove
 token-remove: ## Remove PyPI token configuration
 	@echo "Removing PyPI token..."
 	@poetry config --unset pypi-token.pypi 2>/dev/null || true
-	@python -c "import keyring; keyring.delete_password('pypi-token', 'pypi')" 2>/dev/null || true
+	@# Try to remove from keyring but don't fail if it doesn't work
+	@python -c "import keyring; keyring.delete_password('pypi-token', 'pypi')" 2>/dev/null || echo "Note: Keyring backend not available, token removed from poetry config only"
 	@rm -f ~/.config/pypoetry/auth.toml 2>/dev/null || true
 	@echo "Token removed successfully"
 

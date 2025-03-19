@@ -82,6 +82,10 @@ ruff = "^0.7.2"
 pytest-asyncio = "^0.24.0"
 python-dotenv = "^1.0.1"
 toml = "^0.10.2"
+# Required for keyring operations (especially for token management)
+"keyrings.alt" = "^5.0.0"
+build = "^1.2.0"
+twine = "^5.0.0"
 
 [tool.poetry.extras]
 splunk = ["splunk-sdk"]

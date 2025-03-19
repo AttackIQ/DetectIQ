@@ -211,6 +211,23 @@ To configure the application:
 
 DetectIQ includes a comprehensive Makefile to assist with development, testing, and publishing tasks.
 
+### Prerequisites
+
+Before development, ensure you have:
+
+1. Python 3.9+ installed
+2. Poetry installed
+3. Required development dependencies:
+   ```bash
+   make install-dev
+   ```
+
+This will install all development dependencies, including:
+- Testing tools (pytest)
+- Code quality tools (black, ruff)
+- Package building tools (build, twine)
+- Keyring backends (keyrings.alt) for token management
+
 ### Makefile Commands
 
 To view all available commands:

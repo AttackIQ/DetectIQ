@@ -9,8 +9,19 @@ Before publishing to PyPI, ensure you have the following:
 1. A PyPI account (create one at [pypi.org](https://pypi.org/account/register/))
 2. The necessary tools:
    ```bash
-   pip install --upgrade pip setuptools wheel twine build keyring
+   pip install --upgrade pip setuptools wheel twine build keyring keyrings.alt
    ```
+   Alternatively, use the development dependencies:
+   ```bash
+   make install-dev
+   ```
+   
+3. A PyPI token configured for authentication:
+   ```bash
+   make token-set TOKEN=your-pypi-token
+   ```
+
+> **Note**: The `keyrings.alt` package provides fallback keyring backends for various environments and prevents token-related errors when keyring backends aren't available by default.
 
 ## Publishing Steps
 
