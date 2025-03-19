@@ -140,19 +140,22 @@ token-remove: ## Remove PyPI token configuration
 	@echo "Token removed successfully"
 
 .PHONY: publish
-publish: token-check _safety-check ## Publish to PyPI using twine
+publish: token-check _safety-check clean ## Publish to PyPI using twine
 	@echo "Building package for PyPI..."
 	python -m build
 	@echo "Checking package with twine..."
 	twine check dist/*
 	@echo "Publishing to PyPI..."
-	@TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
+	@# Get latest version from pyproject.toml
+	@VERSION=$$(poetry version -s) && \
+	echo "Publishing version $$VERSION" && \
+	TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
 	if [ -n "$$TOKEN" ]; then \
 		echo "Using token from keyring"; \
-		twine upload dist/* --non-interactive --username __token__ --password "$$TOKEN"; \
+		twine upload "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz" --non-interactive --username __token__ --password "$$TOKEN"; \
 	else \
 		echo "Token not found in keyring, prompting for manual entry"; \
-		twine upload dist/*; \
+		twine upload "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz"; \
 	fi
 
 .PHONY: version
@@ -200,19 +203,22 @@ show-package: build ## Show contents of the built package
 	@unzip -l dist/*.whl || echo "No wheel file found" 
 
 .PHONY: test-publish
-test-publish: token-check _safety-check ## Publish to TestPyPI
+test-publish: token-check _safety-check clean ## Publish to TestPyPI
 	@echo "Building package for TestPyPI..."
 	python -m build
 	@echo "Checking package with twine..."
 	twine check dist/*
 	@echo "Publishing to TestPyPI..."
-	@TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
+	@# Get latest version from pyproject.toml
+	@VERSION=$$(poetry version -s) && \
+	echo "Publishing version $$VERSION to TestPyPI" && \
+	TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
 	if [ -n "$$TOKEN" ]; then \
 		echo "Using token from keyring"; \
-		twine upload --repository-url https://test.pypi.org/legacy/ dist/* --non-interactive --username __token__ --password "$$TOKEN"; \
+		twine upload --repository-url https://test.pypi.org/legacy/ "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz" --non-interactive --username __token__ --password "$$TOKEN"; \
 	else \
 		echo "Token not found in keyring, prompting for manual entry"; \
-		twine upload --repository-url https://test.pypi.org/legacy/ dist/*; \
+		twine upload --repository-url https://test.pypi.org/legacy/ "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz"; \
 	fi
 
 .PHONY: _safety-check
