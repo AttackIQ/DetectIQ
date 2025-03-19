@@ -175,19 +175,19 @@ export default function AboutPage() {
                     icon: <GitHubIcon sx={{ color: '#90caf9' }} />,
                     title: 'Main Repository',
                     description: 'Access the source code, documentation, and project overview',
-                    href: 'https://github.com/slincoln-aiq/DetectIQ'
+                    href: 'https://github.com/AttackIQ/DetectIQ'
                   },
                   {
                     icon: <BugReportIcon sx={{ color: theme.palette.error.main }} />,
                     title: 'Bug Reports',
                     description: 'Report issues or bugs you encounter while using DetectIQ',
-                    href: 'https://github.com/slincoln-aiq/DetectIQ/issues'
+                    href: 'https://github.com/AttackIQ/DetectIQ/issues'
                   },
                   {
                     icon: <ForumIcon sx={{ color: theme.palette.success.main }} />,
                     title: 'Discussions',
                     description: 'Join discussions and suggest new features',
-                    href: 'https://github.com/slincoln-aiq/DetectIQ/discussions'
+                    href: 'https://github.com/AttackIQ/DetectIQ/discussions'
                   }
                 ].map((item, index) => (
                   <Grid item xs={12} md={4} key={index}>
@@ -439,7 +439,7 @@ export default function AboutPage() {
                 <Tooltip title="GitHub">
                   <IconButton 
                     component="a" 
-                    href="https://github.com/slincoln-aiq" 
+                    href="https://github.com/AttackIQ" 
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{ 

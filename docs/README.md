@@ -36,7 +36,7 @@ DetectIQ/
 ### Installation
 **Step 1.** Clone the repository.
 ```bash
-git clone https://github.com/slincoln-aiq/DetectIQ.git
+git clone https://github.com/AttackIQ/DetectIQ.git
 ```
 
 **Step 2.** Set your environment variables (using [`.env.example`](./env.example) as a template).
