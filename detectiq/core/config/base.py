@@ -110,7 +110,7 @@ class ConfigManager:
             openai_api_key = keyring.get_password(self.APP_NAME, "openai_api_key")
         except Exception as err:
             openai_api_key = os.getenv("OPENAI_API_KEY", "")
-        
+
         return {
             "openai_api_key": openai_api_key,
             "llm_model": os.getenv("LLM_MODEL", "gpt-4o"),
