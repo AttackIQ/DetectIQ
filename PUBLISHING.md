@@ -45,11 +45,11 @@ Before publishing to PyPI, ensure you have the following:
 
 3. Build and publish:
    ```bash
-   # Build, check and publish to PyPI
-   make pypi-publish
+   # Test on TestPyPI first (recommended)
+   make test-publish
    
-   # Or test on TestPyPI first
-   make pypi-test-publish
+   # Then publish to PyPI when ready
+   make publish
    ```
 
 4. Additional helpful commands:
@@ -61,7 +61,7 @@ Before publishing to PyPI, ensure you have the following:
    make clean
    
    # Show package contents
-   make show-package-contents
+   make show-package
    ```
 
 ### Option 2: Using the publish.py script
@@ -76,7 +76,7 @@ Before publishing to PyPI, ensure you have the following:
 
 1. Clean previous builds:
    ```bash
-   rm -rf dist/* build/*
+   make clean
    ```
 
 2. Build the package:
