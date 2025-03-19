@@ -1,4 +1,5 @@
 """Documentation resources for DetectIQ."""
+
 import os
 from pathlib import Path
 
@@ -20,15 +21,16 @@ IMAGES = {
     "about": str(IMAGES_DIR / "detectiq_about.png"),
 }
 
+
 def get_image_path(image_name):
     """Get the path to an image by name.
-    
+
     Args:
         image_name (str): Name of the image
-        
+
     Returns:
         str: Full path to the image
-        
+
     Raises:
         ValueError: If image_name is not found
     """
@@ -36,10 +38,11 @@ def get_image_path(image_name):
         raise ValueError(f"Image '{image_name}' not found. Available images: {list(IMAGES.keys())}")
     return IMAGES[image_name]
 
+
 def list_images():
     """List all available documentation images.
-    
+
     Returns:
         dict: Dictionary of image names and paths
     """
-    return IMAGES 
+    return IMAGES
