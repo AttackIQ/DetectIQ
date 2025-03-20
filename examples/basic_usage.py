@@ -7,6 +7,10 @@ This example demonstrates:
 2. Creating Sigma, YARA, and Snort rules
 3. Translating Sigma rules to different formats
 
+Note: When run for the first time, this example will create vector stores
+      for each rule type. This is a one-time process that may take a few minutes.
+      Subsequent runs will load the existing vector stores much faster.
+
 To use this example:
 1. Create and activate a virtual environment:
    python -m venv venv && source venv/bin/activate
@@ -43,6 +47,34 @@ logger = get_logger(__name__)
 load_dotenv()
 
 
+async def initialize_vector_store(llm_instance, llm_type):
+    """Initialize or load vector store for a given LLM instance.
+    
+    Args:
+        llm_instance: The LLM instance (SigmaLLM, YaraLLM, SnortLLM)
+        llm_type: String name of the LLM type for logging
+    
+    Returns:
+        None
+    """
+    logger.info(f"Initializing {llm_type} vector store...")
+    try:
+        llm_instance.load_vectordb()
+        logger.info(f"Successfully loaded existing {llm_type} vector store")
+    except (FileNotFoundError, RuntimeError) as e:
+        # Check if it's a "no such file or directory" error
+        if "No such file or directory" in str(e) or isinstance(e, FileNotFoundError):
+            logger.info(f"First run: Creating new {llm_type} vector store...")
+            # Ensure the directory exists
+            os.makedirs(llm_instance.vector_store_dir, exist_ok=True)
+            await llm_instance.update_rules()
+            await llm_instance.create_vectordb()
+            logger.info(f"Successfully created {llm_type} vector store")
+        else:
+            # If it's some other RuntimeError, re-raise it
+            raise
+
+
 async def demonstrate_sigma_rule_creation(agent_llm, rule_creation_llm):
     """Demonstrate creating a Sigma rule."""
     logger.info("Demonstrating Sigma rule creation...")
@@ -56,14 +88,8 @@ async def demonstrate_sigma_rule_creation(agent_llm, rule_creation_llm):
         vector_store_dir="./sigma_vectorstore",
     )
     
-    # Create or load vector store
-    try:
-        sigma_llm.load_vectordb()
-        logger.info("Successfully loaded existing Sigma vectorstore")
-    except FileNotFoundError:
-        logger.info("Creating new Sigma vectorstore...")
-        await sigma_llm.update_rules()
-        await sigma_llm.create_vectordb()
+    # Initialize vector store
+    await initialize_vector_store(sigma_llm, "Sigma")
     
     # Create agent
     sigma_agent = create_rule_agent(
@@ -116,14 +142,8 @@ async def demonstrate_yara_rule_creation(agent_llm, rule_creation_llm):
         vector_store_dir="./yara_vectorstore",
     )
     
-    # Create or load vector store
-    try:
-        yara_llm.load_vectordb()
-        logger.info("Successfully loaded existing YARA vectorstore")
-    except FileNotFoundError:
-        logger.info("Creating new YARA vectorstore...")
-        await yara_llm.update_rules()
-        await yara_llm.create_vectordb()
+    # Initialize vector store
+    await initialize_vector_store(yara_llm, "YARA")
     
     # Create agent
     yara_agent = create_rule_agent(
@@ -158,14 +178,8 @@ async def demonstrate_snort_rule_creation(agent_llm, rule_creation_llm):
         vector_store_dir="./snort_vectorstore",
     )
     
-    # Create or load vector store
-    try:
-        snort_llm.load_vectordb()
-        logger.info("Successfully loaded existing Snort vectorstore")
-    except FileNotFoundError:
-        logger.info("Creating new Snort vectorstore...")
-        await snort_llm.update_rules()
-        await snort_llm.create_vectordb()
+    # Initialize vector store
+    await initialize_vector_store(snort_llm, "Snort")
     
     # Create agent
     snort_agent = create_rule_agent(

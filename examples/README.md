@@ -45,6 +45,23 @@ This directory contains examples demonstrating how to use the DetectIQ package.
 > **Note**: All examples in subdirectories use the same `.env` file in this directory.
 > You only need to set up one `.env` file for all examples.
 
+## First Run Note
+
+When you run the examples for the first time, DetectIQ will need to:
+1. Create vector stores for rule embeddings
+2. Parse and process any existing rules
+3. Generate vector embeddings
+
+This initialization can take a few minutes, but it only happens on the first run. You'll see logs like:
+
+```
+First run: Creating new Sigma vector store...
+```
+
+On subsequent runs, the vector stores will be loaded from disk much faster. If you see errors about missing vector stores, it's usually because this is the first run and the vector stores haven't been created yet.
+
+The `basic_usage.py` example includes proper error handling for this, so it should work correctly on the first run.
+
 ## Examples Structure
 
 ### Basic Usage
