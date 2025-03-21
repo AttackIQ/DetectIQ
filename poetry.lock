@@ -1215,31 +1215,35 @@ type = ["pytest-mypy"]
 
 [[package]]
 name = "importlib-resources"
-version = "5.13.0"
+version = "6.5.2"
 description = "Read resources from Python packages"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "importlib_resources-5.13.0-py3-none-any.whl", hash = "sha256:9f7bd0c97b79972a6cce36a366356d16d5e13b09679c11a58f1014bfdf8e64b2"},
-    {file = "importlib_resources-5.13.0.tar.gz", hash = "sha256:82d5c6cca930697dbbd86c93333bb2c2e72861d4789a11c2662b933e5ad2b528"},
+    {file = "importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec"},
+    {file = "importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c"},
 ]
 
 [package.dependencies]
 zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1)"]
+cover = ["pytest-cov"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+enabler = ["pytest-enabler (>=2.2)"]
+test = ["jaraco.test (>=5.4)", "pytest (>=6,!=8.1.*)", "zipp (>=3.17)"]
+type = ["pytest-mypy"]
 
 [[package]]
 name = "iniconfig"
-version = "2.0.0"
+version = "2.1.0"
 description = "brain-dead simple config-ini parsing"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
-    {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
+    {file = "iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760"},
+    {file = "iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7"},
 ]
 
 [[package]]
@@ -1556,23 +1560,20 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<10"
 
 [[package]]
 name = "langchain-core"
-version = "0.3.45"
+version = "0.3.47"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_core-0.3.45-py3-none-any.whl", hash = "sha256:fe560d644c102c3f5dcfb44eb5295e26d22deab259fdd084f6b1b55a0350b77c"},
-    {file = "langchain_core-0.3.45.tar.gz", hash = "sha256:a39b8446495d1ea97311aa726478c0a13ef1d77cb7644350bad6d9d3c0141a0c"},
+    {file = "langchain_core-0.3.47-py3-none-any.whl", hash = "sha256:ef7c78202e6fd9df79fe8128c828d08a95d3878cf4aec282580baf358a3f2ec5"},
+    {file = "langchain_core-0.3.47.tar.gz", hash = "sha256:975a3daabf8e8d583749b3c553cc412d0527d935dfe820317431b475fa0c585a"},
 ]
 
 [package.dependencies]
 jsonpatch = ">=1.33,<2.0"
 langsmith = ">=0.1.125,<0.4"
 packaging = ">=23.2,<25"
-pydantic = [
-    {version = ">=2.5.2,<3.0.0", markers = "python_full_version < \"3.12.4\""},
-    {version = ">=2.7.4,<3.0.0", markers = "python_full_version >= \"3.12.4\""},
-]
+pydantic = {version = ">=2.5.2,<3.0.0", markers = "python_full_version < \"3.12.4\""}
 PyYAML = ">=5.3"
 tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<10.0.0"
 typing-extensions = ">=4.7"
@@ -1622,10 +1623,7 @@ files = [
 httpx = ">=0.23.0,<1"
 orjson = {version = ">=3.9.14,<4.0.0", markers = "platform_python_implementation != \"PyPy\""}
 packaging = ">=23.2"
-pydantic = [
-    {version = ">=1,<3", markers = "python_full_version < \"3.12.4\""},
-    {version = ">=2.7.4,<3.0.0", markers = "python_full_version >= \"3.12.4\""},
-]
+pydantic = {version = ">=1,<3", markers = "python_full_version < \"3.12.4\""}
 requests = ">=2,<3"
 requests-toolbelt = ">=1.0.0,<2.0.0"
 zstandard = ">=0.23.0,<0.24.0"
@@ -1994,13 +1992,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.66.5"
+version = "1.68.0"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "openai-1.66.5-py3-none-any.whl", hash = "sha256:74be528175f8389f67675830c51a15bd51e874425c86d3de6153bf70ed6c2884"},
-    {file = "openai-1.66.5.tar.gz", hash = "sha256:f61b8fac29490ca8fdc6d996aa6926c18dbe5639536f8c40219c40db05511b11"},
+    {file = "openai-1.68.0-py3-none-any.whl", hash = "sha256:20e279b0f3a78cb4a95f3eab2a180f3ee30c6a196aeebd6bf642a4f88ab85ee1"},
+    {file = "openai-1.68.0.tar.gz", hash = "sha256:c570c06c9ba10f98b891ac30a3dd7b5c89ed48094c711c7a3f35fb5ade6c0757"},
 ]
 
 [package.dependencies]
@@ -2008,8 +2006,10 @@ anyio = ">=3.5.0,<5"
 distro = ">=1.7.0,<2"
 httpx = ">=0.23.0,<1"
 jiter = ">=0.4.0,<1"
+numpy = ">=2.0.2"
 pydantic = ">=1.9.0,<3"
 sniffio = "*"
+sounddevice = ">=0.5.1"
 tqdm = ">4"
 typing-extensions = ">=4.11,<5"
 
@@ -2154,19 +2154,19 @@ testing = ["pytest", "pytest-cov", "wheel"]
 
 [[package]]
 name = "platformdirs"
-version = "4.3.6"
+version = "4.3.7"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "platformdirs-4.3.6-py3-none-any.whl", hash = "sha256:73e575e1408ab8103900836b97580d5307456908a03e92031bab39e4554cc3fb"},
-    {file = "platformdirs-4.3.6.tar.gz", hash = "sha256:357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"},
+    {file = "platformdirs-4.3.7-py3-none-any.whl", hash = "sha256:a03875334331946f13c549dbd8f4bac7a13a50a895a0eb1e8c6a8ace80d40a94"},
+    {file = "platformdirs-4.3.7.tar.gz", hash = "sha256:eb437d586b6a0986388f0d6f74aa0cde27b48d0e3d66843640bfb6bdcdb6e351"},
 ]
 
 [package.extras]
-docs = ["furo (>=2024.8.6)", "proselint (>=0.14)", "sphinx (>=8.0.2)", "sphinx-autodoc-typehints (>=2.4)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.2)", "pytest-cov (>=5)", "pytest-mock (>=3.14)"]
-type = ["mypy (>=1.11.2)"]
+docs = ["furo (>=2024.8.6)", "proselint (>=0.14)", "sphinx (>=8.1.3)", "sphinx-autodoc-typehints (>=3)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.4)", "pytest-cov (>=6)", "pytest-mock (>=3.14)"]
+type = ["mypy (>=1.14.1)"]
 
 [[package]]
 name = "pluggy"
@@ -2616,13 +2616,13 @@ files = [
 
 [[package]]
 name = "pysigma"
-version = "0.11.18"
+version = "0.11.19"
 description = "Sigma rule processing and conversion tools"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pysigma-0.11.18-py3-none-any.whl", hash = "sha256:0c6fe40bac12dc214b529ed87e8aae2ae350d68cf76e2e9e6176981f1976c615"},
-    {file = "pysigma-0.11.18.tar.gz", hash = "sha256:eb625590dbc9822bed9ad0d64cb42fb3df69581d98c0c87f674df255b1a617d7"},
+    {file = "pysigma-0.11.19-py3-none-any.whl", hash = "sha256:5e5f669fbb9fdf1e6e2a3f096b5c5c0c167ec333dafa9975e6481f9fb34294b2"},
+    {file = "pysigma-0.11.19.tar.gz", hash = "sha256:075df35e56f2128491f8ad501cc063d88d282879d37b50213fc6b5008fac8625"},
 ]
 
 [package.dependencies]
@@ -2676,13 +2676,13 @@ pysigma = ">=0.11.13,<0.12.0"
 
 [[package]]
 name = "pysigma-backend-elasticsearch"
-version = "1.1.3"
+version = "1.1.5"
 description = "pySigma Elasticsearch backend supporting Lucene, ES|QL (with correlations) and EQL queries"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pysigma_backend_elasticsearch-1.1.3-py3-none-any.whl", hash = "sha256:a4badec976d6c280c61384c542096f38b92b759ef1a0b7a0a3e4aa51f9c01d57"},
-    {file = "pysigma_backend_elasticsearch-1.1.3.tar.gz", hash = "sha256:76680f1373d65a3d09ac466fd15e25c7287f6cad5e323326ca790441ba44f99c"},
+    {file = "pysigma_backend_elasticsearch-1.1.5-py3-none-any.whl", hash = "sha256:37b8abe35464c29c4ae69d12f26739c7fc874160c9108a44df2b38932202ecc5"},
+    {file = "pysigma_backend_elasticsearch-1.1.5.tar.gz", hash = "sha256:847ac473f0153c05cdde6fb8747955ad4b9e98966d5f2c61ce009a2c5c9ce92a"},
 ]
 
 [package.dependencies]
@@ -2704,13 +2704,13 @@ pysigma = ">=0.10.1,<0.12.0"
 
 [[package]]
 name = "pysigma-backend-kusto"
-version = "0.4.2"
+version = "0.4.3"
 description = "pySigma Kusto backend"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pysigma_backend_kusto-0.4.2-py3-none-any.whl", hash = "sha256:4dcadd2f72f04d9738241ea6b3879bf0c6944fbf13ffc9487ef7aa8f007be79d"},
-    {file = "pysigma_backend_kusto-0.4.2.tar.gz", hash = "sha256:ed9eeb1d19dac5ff4070e973c634104265556410f20ac6be0e1a1cd4ed93c57e"},
+    {file = "pysigma_backend_kusto-0.4.3-py3-none-any.whl", hash = "sha256:06fe35f728ab2f652492d8cde06bab4ced147487b31b8bf59fe8d11b56eb2447"},
+    {file = "pysigma_backend_kusto-0.4.3.tar.gz", hash = "sha256:28045c18e44137a791b35182642647bd7b0d6cea833a10a10b57049293243650"},
 ]
 
 [package.dependencies]
@@ -2719,17 +2719,17 @@ pysigma = ">=0.10.0"
 
 [[package]]
 name = "pysigma-backend-loki"
-version = "0.12.2"
+version = "0.12.3"
 description = "pySigma Loki backend"
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pysigma_backend_loki-0.12.2-py3-none-any.whl", hash = "sha256:d93ed16a810aed14bca6e1aa1e68974d68b8bfaccbadb182cb32bac829ecacdf"},
-    {file = "pysigma_backend_loki-0.12.2.tar.gz", hash = "sha256:bc8e3756175524b7ac0ce9c4046117c7b99ef99df4da3f3301c44fe1cd78ff69"},
+    {file = "pysigma_backend_loki-0.12.3-py3-none-any.whl", hash = "sha256:790f7c582b021271429f87b5363ac28ac431d445b687e0f8503cd5f0e921e82a"},
+    {file = "pysigma_backend_loki-0.12.3.tar.gz", hash = "sha256:34185da86bcb7cc89c1f89d30d4742775c8097e4566b0c2faa21622eb22dd1f9"},
 ]
 
 [package.dependencies]
-pysigma = ">=0.11.14,<0.12.0"
+pysigma = ">=0.11.19,<0.12.0"
 
 [[package]]
 name = "pysigma-backend-netwitness"
@@ -2747,13 +2747,13 @@ pysigma = ">=0.11.9,<0.12.0"
 
 [[package]]
 name = "pysigma-backend-opensearch"
-version = "1.0.3"
+version = "1.0.4"
 description = "pySigma OpenSearch backend"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pysigma_backend_opensearch-1.0.3-py3-none-any.whl", hash = "sha256:f0d0650fa9fc69df186f07520157bc5b405677c4e77261a942992a2d923afb0b"},
-    {file = "pysigma_backend_opensearch-1.0.3.tar.gz", hash = "sha256:3ce5d61dd54eadd6c66c400019fc4d1fcfa118111e00e0c09396fafbc20db40e"},
+    {file = "pysigma_backend_opensearch-1.0.4-py3-none-any.whl", hash = "sha256:d1d6f6a499288f0966e3360db75d1350de996222c3b5b22608e2b3634bdf1721"},
+    {file = "pysigma_backend_opensearch-1.0.4.tar.gz", hash = "sha256:531dd6d44e8489befb500215a76adf04dc7b6b6e217f9fcbda6a0192e2ca7624"},
 ]
 
 [package.dependencies]
@@ -2806,17 +2806,17 @@ pysigma = ">=0.9.5"
 
 [[package]]
 name = "pysigma-backend-splunk"
-version = "1.1.0"
+version = "1.1.3"
 description = "pySigma Splunk backend"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "pysigma_backend_splunk-1.1.0-py3-none-any.whl", hash = "sha256:c681bae6480496604af1f230c2fd0d697cf187482730c5a07789d9141f81faa2"},
-    {file = "pysigma_backend_splunk-1.1.0.tar.gz", hash = "sha256:82c979e2e1e153d69c186cdc7457987132b721ffd8e60a8696a5c84905b64f0d"},
+    {file = "pysigma_backend_splunk-1.1.3-py3-none-any.whl", hash = "sha256:92302f6f549d7da719bac971e6a96eef0b4160e081da7227402d2bef2adb1c33"},
+    {file = "pysigma_backend_splunk-1.1.3.tar.gz", hash = "sha256:2525f086f29f88699922e91180329c26108d0fdb6c06865ad40230dc19e43fbc"},
 ]
 
 [package.dependencies]
-pysigma = ">=0.11.1,<0.12.0"
+pysigma = ">=0.11.18,<0.12.0"
 
 [[package]]
 name = "pysigma-backend-stix2"
@@ -3330,35 +3330,55 @@ name = "sigmaiq"
 version = "0.4.5"
 description = "Wrapper and tools for pySigma and Sigma rules"
 optional = false
-python-versions = "<3.14,>=3.9"
-files = [
-    {file = "sigmaiq-0.4.5-py3-none-any.whl", hash = "sha256:c407bccb612717af052a727cce982684dc08be8dd6e6f5ea9edf285dd57b4f8e"},
-    {file = "sigmaiq-0.4.5.tar.gz", hash = "sha256:f77376f4d84a970b53188d02a01e2daf13058719a625ce0163ec6ca701e93a82"},
-]
+python-versions = ">=3.9, <=3.12"
+files = []
+develop = false
 
 [package.dependencies]
-certifi = ">=2024.8.30"
-importlib-resources = ">=5.13.0,<6.0.0"
-pysigma = "0.11.18"
-pysigma-backend-carbonblack = "0.1.8"
-pysigma-backend-cortexxdr = "0.1.4"
-pysigma-backend-crowdstrike = "2.0.1"
-pysigma-backend-elasticsearch = "1.1.3"
-pysigma-backend-insightidr = "0.2.4"
-pysigma-backend-kusto = "0.4.2"
-pysigma-backend-loki = "0.12.2"
-pysigma-backend-netwitness = "0.1.3"
-pysigma-backend-opensearch = "1.0.3"
-pysigma-backend-qradar-aql = "0.3.2"
+certifi = "*"
+faiss-cpu = "*"
+importlib-resources = "*"
+langchain = "*"
+langchain-community = "*"
+langchain-core = "*"
+langchain-openai = "*"
+openai = "*"
+pysigma = "^0.11.14"
+pysigma-backend-carbonblack = "^0.1.8"
+pysigma-backend-cortexxdr = "^0.1.4"
+pysigma-backend-crowdstrike = "^2.0.0"
+pysigma-backend-elasticsearch = "^1.1.2"
+pysigma-backend-insightidr = "^0.2.4"
+pysigma-backend-kusto = "^0.4.0"
+pysigma-backend-loki = "^0.12.0"
+pysigma-backend-netwitness = "^0.1.3"
+pysigma-backend-opensearch = "^1.0.2"
+pysigma-backend-qradar-aql = "^0.3.2"
 pysigma-backend-secops = "0.1.4"
-pysigma-backend-sentinelone = "0.1.3"
-pysigma-backend-splunk = "1.1.0"
-pysigma-backend-stix2 = "0.2.0"
-pysigma-pipeline-sysmon = "1.0.4"
-pysigma-pipeline-windows = "1.2.0"
+pysigma-backend-sentinelone = "^0.1.3"
+pysigma-backend-splunk = "^1.1.0"
+pysigma-backend-stix2 = "^0.2.0"
+pysigma-pipeline-sysmon = "^1.0.4"
+pysigma-pipeline-windows = "^1.2.0"
+six = "*"
+tiktoken = "*"
 
-[package.extras]
-llm = ["faiss-cpu", "langchain (>=0.2.9,<0.3.0)", "langchain-community (>=0.2.7,<0.3.0)", "langchain-core (>=0.2.20,<0.3.0)", "langchain-openai (>=0.1.17,<0.2.0)", "openai", "tiktoken"]
+[package.source]
+type = "git"
+url = "https://github.com/AttackIQ/SigmAIQ.git"
+reference = "0.4.35"
+resolved_reference = "2d9e03ce089de3a7e31c049a9c28cf082d6526e1"
+
+[[package]]
+name = "six"
+version = "1.17.0"
+description = "Python 2 and 3 compatibility utilities"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+files = [
+    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
+]
 
 [[package]]
 name = "sniffio"
@@ -3370,6 +3390,26 @@ files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
 ]
+
+[[package]]
+name = "sounddevice"
+version = "0.5.1"
+description = "Play and Record Sound with Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "sounddevice-0.5.1-py3-none-any.whl", hash = "sha256:e2017f182888c3f3c280d9fbac92e5dbddac024a7e3442f6e6116bd79dab8a9c"},
+    {file = "sounddevice-0.5.1-py3-none-macosx_10_6_x86_64.macosx_10_6_universal2.whl", hash = "sha256:d16cb23d92322526a86a9490c427bf8d49e273d9ccc0bd096feecd229cde6031"},
+    {file = "sounddevice-0.5.1-py3-none-win32.whl", hash = "sha256:d84cc6231526e7a08e89beff229c37f762baefe5e0cc2747cbe8e3a565470055"},
+    {file = "sounddevice-0.5.1-py3-none-win_amd64.whl", hash = "sha256:4313b63f2076552b23ac3e0abd3bcfc0c1c6a696fc356759a13bd113c9df90f1"},
+    {file = "sounddevice-0.5.1.tar.gz", hash = "sha256:09ca991daeda8ce4be9ac91e15a9a81c8f81efa6b695a348c9171ea0c16cb041"},
+]
+
+[package.dependencies]
+CFFI = ">=1.0"
+
+[package.extras]
+numpy = ["NumPy"]
 
 [[package]]
 name = "splunk-sdk"
@@ -4028,5 +4068,5 @@ webapp = ["django", "django-cors-headers", "django-environ", "django-extensions"
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.9, <3.14"
-content-hash = "fc70259f0aa5b157f1dfd4165550bd5e684b85ffe22a67f7e8193ad9782ac814"
+python-versions = ">=3.9, <=3.12"
+content-hash = "c75dd5d3716e280070ae057a245f583bf83fc1cffc03cce88f930b7de1cae889"
