@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "detectiq"
-version = "0.1.10"
+version = "0.1.11"
 description = "A detection engineering workbench with LLM capabilities"
 authors = ["AttackIQ <rajesh.sharma@attackiq.com>"]
 readme = "README.md"
@@ -38,7 +38,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.9, <=3.12"
-sigmaiq = {git = "https://github.com/AttackIQ/SigmAIQ.git", tag = "0.4.35"}
+attackiq-sigmaiq = ">=0.4.35"
 langchain = "^0.3.7"
 langchain-community = "^0.3.7"
 langchain-openai = "^0.2.8"

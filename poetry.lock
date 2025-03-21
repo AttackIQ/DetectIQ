@@ -201,6 +201,46 @@ files = [
 ]
 
 [[package]]
+name = "attackiq-sigmaiq"
+version = "0.4.36"
+description = "Wrapper and tools for pySigma and Sigma rules"
+optional = false
+python-versions = "<=3.12,>=3.9"
+files = [
+    {file = "attackiq_sigmaiq-0.4.36-py3-none-any.whl", hash = "sha256:9d7b00435e609473259e4c1c74930e00b82c7e2f55c66d0b8aa3202fc4fe64ec"},
+    {file = "attackiq_sigmaiq-0.4.36.tar.gz", hash = "sha256:6601e72e81df751bbf71542e89d0855f1258e269e893537c56583acef5a23ad5"},
+]
+
+[package.dependencies]
+certifi = "*"
+faiss-cpu = "*"
+importlib-resources = "*"
+langchain = "*"
+langchain-community = "*"
+langchain-core = "*"
+langchain-openai = "*"
+openai = "*"
+pysigma = ">=0.11.14,<0.12.0"
+pysigma-backend-carbonblack = ">=0.1.8,<0.2.0"
+pysigma-backend-cortexxdr = ">=0.1.4,<0.2.0"
+pysigma-backend-crowdstrike = ">=2.0.0,<3.0.0"
+pysigma-backend-elasticsearch = ">=1.1.2,<2.0.0"
+pysigma-backend-insightidr = ">=0.2.4,<0.3.0"
+pysigma-backend-kusto = ">=0.4.0,<0.5.0"
+pysigma-backend-loki = ">=0.12.0,<0.13.0"
+pysigma-backend-netwitness = ">=0.1.3,<0.2.0"
+pysigma-backend-opensearch = ">=1.0.2,<2.0.0"
+pysigma-backend-qradar-aql = ">=0.3.2,<0.4.0"
+pysigma-backend-secops = "0.1.4"
+pysigma-backend-sentinelone = ">=0.1.3,<0.2.0"
+pysigma-backend-splunk = ">=1.1.0,<2.0.0"
+pysigma-backend-stix2 = ">=0.2.0,<0.3.0"
+pysigma-pipeline-sysmon = ">=1.0.4,<2.0.0"
+pysigma-pipeline-windows = ">=1.2.0,<2.0.0"
+six = "*"
+tiktoken = "*"
+
+[[package]]
 name = "attrs"
 version = "25.3.0"
 description = "Classes Without Boilerplate"
@@ -3326,50 +3366,6 @@ cryptography = ">=2.0"
 jeepney = ">=0.6"
 
 [[package]]
-name = "sigmaiq"
-version = "0.4.5"
-description = "Wrapper and tools for pySigma and Sigma rules"
-optional = false
-python-versions = ">=3.9, <=3.12"
-files = []
-develop = false
-
-[package.dependencies]
-certifi = "*"
-faiss-cpu = "*"
-importlib-resources = "*"
-langchain = "*"
-langchain-community = "*"
-langchain-core = "*"
-langchain-openai = "*"
-openai = "*"
-pysigma = "^0.11.14"
-pysigma-backend-carbonblack = "^0.1.8"
-pysigma-backend-cortexxdr = "^0.1.4"
-pysigma-backend-crowdstrike = "^2.0.0"
-pysigma-backend-elasticsearch = "^1.1.2"
-pysigma-backend-insightidr = "^0.2.4"
-pysigma-backend-kusto = "^0.4.0"
-pysigma-backend-loki = "^0.12.0"
-pysigma-backend-netwitness = "^0.1.3"
-pysigma-backend-opensearch = "^1.0.2"
-pysigma-backend-qradar-aql = "^0.3.2"
-pysigma-backend-secops = "0.1.4"
-pysigma-backend-sentinelone = "^0.1.3"
-pysigma-backend-splunk = "^1.1.0"
-pysigma-backend-stix2 = "^0.2.0"
-pysigma-pipeline-sysmon = "^1.0.4"
-pysigma-pipeline-windows = "^1.2.0"
-six = "*"
-tiktoken = "*"
-
-[package.source]
-type = "git"
-url = "https://github.com/AttackIQ/SigmAIQ.git"
-reference = "0.4.35"
-resolved_reference = "2d9e03ce089de3a7e31c049a9c28cf082d6526e1"
-
-[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -4069,4 +4065,4 @@ webapp = ["django", "django-cors-headers", "django-environ", "django-extensions"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <=3.12"
-content-hash = "c75dd5d3716e280070ae057a245f583bf83fc1cffc03cce88f930b7de1cae889"
+content-hash = "cc8706f0c4847c3e78fe512746f2f30e019ad14ce96dca1984c76b2be097e15f"
