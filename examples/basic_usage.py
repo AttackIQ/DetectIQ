@@ -29,6 +29,7 @@ To use this example:
 import argparse
 import asyncio
 import os
+import sys
 from pathlib import Path
 from typing import cast, Dict, Any, Union, Optional
 
@@ -558,9 +559,7 @@ def setup_argparse():
         description="DetectIQ CLI for creating security detection rules"
     )
 
-    subparsers = parser.add_subparsers(
-        dest="command", help="Command to execute", required=True
-    )
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Setup embeddings command
     subparsers.add_parser(
@@ -608,14 +607,27 @@ def setup_argparse():
 
 async def main():
     """Run the appropriate command based on command-line arguments using argparse."""
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise ValueError(
-            "OPENAI_API_KEY not found in environment variables. "
-            "Please set it in your .env file or environment."
-        )
+    # Check for OPENAI_API_KEY only if we're not just showing help
+    if "-h" not in sys.argv and "--help" not in sys.argv:
+        if not os.environ.get("OPENAI_API_KEY"):
+            raise ValueError(
+                "OPENAI_API_KEY not found in environment variables. "
+                "Please set it in your .env file or environment."
+            )
 
     parser = setup_argparse()
-    args = parser.parse_args()
+
+    # Try/except to catch SystemExit from argparse help
+    try:
+        args = parser.parse_args()
+
+        # If no command was specified, show help and exit
+        if not args.command:
+            parser.print_help()
+            return
+    except SystemExit:
+        # This is expected when showing help
+        return
 
     try:
         if args.command == "setup-embeddings":
