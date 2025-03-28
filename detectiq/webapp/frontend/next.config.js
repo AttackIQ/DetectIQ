@@ -3,7 +3,12 @@ const nextConfig = {
   trailingSlash: true,
   experimental: {
     proxyTimeout: 600000, // 10 minutes
+    serverComponentsExternalPackages: ['sharp'],
   },
+  httpAgentOptions: {
+    keepAlive: true,
+  },
+  staticPageGenerationTimeout: 600000, // 10 minutes
   async rewrites() {
     return [
       // API endpoints only - not the page itself
@@ -54,12 +59,6 @@ const nextConfig = {
       //  basePath: false
       //},
     ];
-  },
-  // Increase timeouts
-  serverOptions: {
-    timeout: 600000, // 10 minutes
-    keepAliveTimeout: 610000, // Slightly longer than timeout
-    headersTimeout: 620000, // Slightly longer than keepAliveTimeout
   },
   // Increase webpack buffer
   webpack: (config) => {

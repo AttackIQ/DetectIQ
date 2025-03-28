@@ -1,7 +1,7 @@
 # Set the shell to bash
 SHELL := /bin/bash
 
-.SILENT: install/backend/dependencies install/frontend/dependencies install/backend start/backend start/frontend run/local
+.SILENT: install/backend/dependencies install/frontend/dependencies install/backend start/backend start/frontend run/local dev restart restart/frontend restart/backend clean/backend clean/frontend clean
 
 APP_NAME ?= "DetectIQ"
 
@@ -20,16 +20,49 @@ help: ## Show this help message
 	@echo "  make <target>"
 	@echo ""
 	@echo "Targets:"
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_\/-]+:.*?## / {printf "  %-25s%s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+	@echo "  help                     Show this help message"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_\/-]+:.*?## / {if ($$1 != "help") printf "  %-25s%s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 	@echo ""
 	@echo "⚠️  IMPORTANT: Never commit or distribute .env files with API keys or secrets!"
 	@echo "    Use .env.example as a template, but keep your .env files private."
 
+# CLEAN TARGETS
+.PHONY: clean/backend
+clean/backend: ## Clean Python-related files and backend build artifacts
+	@echo "\033[1;33m[*] Cleaning backend artifacts\033[0m"
+	@echo "Cleaning up Python cache files and build artifacts..."
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	find . -type f -name "*.pyd" -delete 2>/dev/null || true
+	rm -rf dist/ build/ 2>/dev/null || true
+	rm -rf .pytest_cache/ .ruff_cache/ .coverage htmlcov/ .mypy_cache/ .tox/ 2>/dev/null || true
+	@echo "\033[1;32m[✓] Backend cleaned\033[0m"
+
+.PHONY: clean/frontend
+clean/frontend: ## Clean frontend build artifacts and dependencies
+	@echo "\033[1;33m[*] Cleaning frontend artifacts\033[0m"
+	@if [ -d "detectiq/webapp/frontend/node_modules" ]; then \
+		echo "Cleaning frontend node_modules..."; \
+		rm -rf detectiq/webapp/frontend/node_modules; \
+	fi
+	@if [ -d "detectiq/webapp/frontend/.next" ]; then \
+		echo "Cleaning frontend .next..."; \
+		rm -rf detectiq/webapp/frontend/.next; \
+	fi
+	@echo "\033[1;32m[✓] Frontend cleaned\033[0m"
+
+.PHONY: clean
+clean: stop clean/backend clean/frontend ## Stop servers and clean both backend and frontend
+	@echo "\033[1;33m[*] Deep cleaning entire project\033[0m"
+	@echo "\033[1;32m[✓] Project cleaned\033[0m"
+
+# INSTALL TARGETS
 install/backend/dependencies: 
 	@echo "\033[1;33m[*] Installing '$(APP_NAME)' backend dependencies\033[0m"
 	poetry install --all-extras
 
-install/backend: install/backend/dependencies ## Build backend and initialize databases and rulesets
+install/backend: install/backend/dependencies ## Install backend with all dependencies and initialize databases/rulesets
 	@echo "\033[1;33m[*] Building '$(APP_NAME)' backend\033[0m"
 	cd detectiq/ &&\
 	poetry run python manage.py migrate &&\
@@ -39,66 +72,165 @@ install/backend: install/backend/dependencies ## Build backend and initialize da
 
 install/frontend/dependencies: 
 	@echo "\033[1;33m[*] Installing '$(APP_NAME)' frontend dependencies\033[0m"
-	cd detectiq/webapp/frontend &&\
+	@if ! command -v npm &> /dev/null; then \
+		echo "\033[1;31m[!] npm is not installed. Please install Node.js and npm first.\033[0m"; \
+		exit 1; \
+	fi
+	@if [ ! -d "detectiq/webapp/frontend" ]; then \
+		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
+		exit 1; \
+	fi
+	cd detectiq/webapp/frontend && \
+	npm install && \
+	npm audit fix --force || true && \
 	npm install
 
-install/local: install/backend install/frontend/dependencies ## Complete local installation of both backend and frontend
+.PHONY: install
+install: install/backend install/frontend/dependencies ## Install both backend (Django) and frontend (Next.js) dependencies
 	@echo "\033[1;32m[!] Installing '${APP_NAME}'\033[0m"
 
+# START TARGETS
 start/backend: 
 	@echo "\033[1;33m[*] Starting '$(APP_NAME)' backend\033[0m"
+	@# Check if port 8000 is already in use
+	@if lsof -i:8000 >/dev/null 2>&1; then \
+		echo "\033[1;31m[!] Port 8000 is already in use. Attempting to kill the process...\033[0m"; \
+		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@# Start the backend server
 	cd detectiq/webapp/backend &&\
-	poetry run python manage.py runserver &
-	sleep 10
+	poetry run python manage.py runserver 2>&1 &
+	@# Wait for server to start and check if it's running
+	@for i in {1..10}; do \
+		if curl -s http://localhost:8000/ >/dev/null 2>&1; then \
+			echo "\033[1;32m[✓] Backend server started successfully\033[0m"; \
+			break; \
+		fi; \
+		if [ $$i -eq 10 ]; then \
+			echo "\033[1;31m[!] Failed to start backend server\033[0m"; \
+			exit 1; \
+		fi; \
+		sleep 1; \
+	done
 
 start/frontend: 
 	@echo "\033[1;33m[*] Starting '$(APP_NAME)' frontend\033[0m"
-	cd detectiq/webapp/frontend &&\
-	npm run dev
+	@if ! command -v npm &> /dev/null; then \
+		echo "\033[1;31m[!] npm is not installed. Please install Node.js and npm first.\033[0m"; \
+		exit 1; \
+	fi
+	@if [ ! -d "detectiq/webapp/frontend" ]; then \
+		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
+		exit 1; \
+	fi
+	@if [ ! -f "detectiq/webapp/frontend/node_modules/.bin/next" ]; then \
+		echo "\033[1;31m[!] Next.js not found. Please run 'make install/frontend/dependencies' first.\033[0m"; \
+		exit 1; \
+	fi
+	@# Start the frontend server with better error handling
+	cd detectiq/webapp/frontend && \
+	(npm run dev 2>&1 || \
+		(echo "\033[1;31m[!] Failed to start frontend server. Trying to fix dependencies...\033[0m" && \
+		rm -rf node_modules/.next && \
+		npm install && \
+		npm run dev))
 
-run/local: start/backend start/frontend ## Run both backend and frontend servers
+.PHONY: start
+start: install stop start/backend start/frontend ## Start both backend (Django:8000) and frontend (Next.js:3000) servers
 	@echo "\033[1;33m[*] Running '$(APP_NAME)'\033[0m"
 
-.PHONY: format-ruff
-format-ruff: ## Run code formatting and linting
+# RESTART TARGETS
+.PHONY: restart
+restart: stop start ## Restart both servers
+
+.PHONY: restart/frontend
+restart/frontend: ## Restart only the frontend server
+	@echo "\033[1;33m[*] Restarting frontend server\033[0m"
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "Stopping frontend server..."; \
+		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@$(MAKE) start/frontend
+
+.PHONY: restart/backend
+restart/backend: ## Restart only the backend server
+	@echo "\033[1;33m[*] Restarting backend server\033[0m"
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		echo "Stopping backend server..."; \
+		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@$(MAKE) start/backend
+
+# STOP TARGET
+.PHONY: stop
+stop: ## Stop both backend (Django:8000) and frontend (Next.js:3000) servers
+	@echo "\033[1;33m[*] Stopping all servers\033[0m"
+	@# Kill Django backend server
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		echo "Stopping backend server..."; \
+		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
+	fi
+	@# Kill Next.js frontend server
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "Stopping frontend server..."; \
+		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
+	fi
+	@echo "\033[1;32m[✓] All servers stopped\033[0m"
+
+# STATUS TARGET
+.PHONY: status
+status: ## Check status of both backend (Django:8000) and frontend (Next.js:3000) servers
+	@echo "\033[1;33m[*] Checking server status\033[0m"
+	@echo "\nBackend server (port 8000):"
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		echo "\033[1;32m[✓] Running\033[0m"; \
+	else \
+		echo "\033[1;31m[✗] Not running\033[0m"; \
+	fi
+	@echo "\nFrontend server (port 3000):"
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "\033[1;32m[✓] Running\033[0m"; \
+	else \
+		echo "\033[1;31m[✗] Not running\033[0m"; \
+	fi
+
+# LOGS TARGET
+.PHONY: logs
+logs: ## Show both backend (Django) and frontend (Next.js) server logs
+	@echo "\033[1;33m[*] Showing server logs\033[0m"
+	@echo "\nBackend server logs:"
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		ps aux | grep "python manage.py runserver" | grep -v grep; \
+	else \
+		echo "Backend server is not running"; \
+	fi
+	@echo "\nFrontend server logs:"
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		ps aux | grep "next dev" | grep -v grep; \
+	else \
+		echo "Frontend server is not running"; \
+	fi
+
+# TEST TARGET
+.PHONY: test
+test: _lock ## Run backend tests with coverage (installs test dependencies if needed)
+	@echo "Installing test dependencies..."
+	poetry install --with dev
+	@echo "Running tests with coverage..."
+	poetry run pytest tests/ --cov=detectiq --cov-report=term-missing
+
+.PHONY: format/backend
+format/backend: ## Format and lint backend Python code using black and ruff
 	@echo "Formatting Python files with black..."
 	poetry run black $(PYTHON_FILES)
 	@echo "Running Ruff linter..."
 	poetry run ruff check $(PYTHON_FILES) || true
 	@echo "Formatting and linting completed"
 
-.PHONY: install-dev
-install-dev: _lock ## Install development dependencies
-	@echo "Installing development dependencies..."
-	poetry install --with dev
-
-.PHONY: test
-test: install-dev ## Run tests (with coverage)
-	@echo "Running tests with coverage..."
-	poetry run pytest tests/ --cov=detectiq --cov-report=term-missing
-
-.PHONY: clean
-clean: ## Clean up python cache files and build artifacts
-	@echo "Cleaning up cache files and build artifacts..."
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete 2>/dev/null || true
-	find . -type f -name "*.pyo" -delete 2>/dev/null || true
-	find . -type f -name "*.pyd" -delete 2>/dev/null || true
-	rm -rf dist/ build/ 2>/dev/null || true
-	rm -rf .pytest_cache/ .ruff_cache/ .coverage htmlcov/ .mypy_cache/ .tox/ 2>/dev/null || true
-
-.PHONY: build
-build: _safety-check clean ## Build the package (core-only, without webapp components)
-	@echo "Building core-only package..."
-	@echo "Checking package configuration..."
-	@grep -q "detectiq/webapp" pyproject.toml || { echo "Error: webapp exclusion not found in pyproject.toml"; exit 1; }
-	@grep -q "detectiq/webapp" MANIFEST.in || { echo "Error: webapp exclusion not found in MANIFEST.in"; exit 1; }
-	@echo "Configuration looks good, building package..."
-	python -m build
-	@echo "Checking built package contents (shouldn't contain webapp)..."
-	unzip -l dist/*.whl | grep "detectiq/webapp" && { echo "Error: Package still contains webapp files!"; exit 1; } || echo "✓ No webapp files found in package."
-	@echo "Core-only package built successfully."
-
+# TOKEN TARGETS
 .PHONY: token-check
 token-check: ## Check if PyPI token is configured
 	@echo "Checking PyPI token configuration..."
@@ -139,25 +271,7 @@ token-remove: ## Remove PyPI token configuration
 	@rm -f ~/.config/pypoetry/auth.toml 2>/dev/null || true
 	@echo "Token removed successfully"
 
-.PHONY: publish
-publish: token-check _safety-check clean ## Publish to PyPI using twine
-	@echo "Building package for PyPI..."
-	python -m build
-	@echo "Checking package with twine..."
-	twine check dist/*
-	@echo "Publishing to PyPI..."
-	@# Get latest version from pyproject.toml
-	@VERSION=$$(poetry version -s) && \
-	echo "Publishing version $$VERSION" && \
-	TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
-	if [ -n "$$TOKEN" ]; then \
-		echo "Using token from keyring"; \
-		twine upload "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz" --non-interactive --username __token__ --password "$$TOKEN"; \
-	else \
-		echo "Token not found in keyring, prompting for manual entry"; \
-		twine upload "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz"; \
-	fi
-
+# VERSION TARGETS
 .PHONY: version
 version: ## Display current version
 	@poetry version
@@ -189,53 +303,3 @@ _sync-version:
 _lock:
 	@echo "Updating poetry.lock file..."
 	poetry lock
-
-.PHONY: update
-update: ## Update dependencies to their latest versions
-	@echo "Updating dependencies..."
-	poetry update 
-
-.PHONY: show-package
-show-package: build ## Show contents of the built package
-	@echo "Package contents:"
-	@tar -tvf dist/*.tar.gz || echo "No tar.gz file found"
-	@echo "\nWheel contents:"
-	@unzip -l dist/*.whl || echo "No wheel file found" 
-
-.PHONY: test-publish
-test-publish: token-check _safety-check clean ## Publish to TestPyPI
-	@echo "Building package for TestPyPI..."
-	python -m build
-	@echo "Checking package with twine..."
-	twine check dist/*
-	@echo "Publishing to TestPyPI..."
-	@# Get latest version from pyproject.toml
-	@VERSION=$$(poetry version -s) && \
-	echo "Publishing version $$VERSION to TestPyPI" && \
-	TOKEN=$$(python -c "import keyring; print(keyring.get_password('pypi-token', 'pypi'))") && \
-	if [ -n "$$TOKEN" ]; then \
-		echo "Using token from keyring"; \
-		twine upload --repository-url https://test.pypi.org/legacy/ "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz" --non-interactive --username __token__ --password "$$TOKEN"; \
-	else \
-		echo "Token not found in keyring, prompting for manual entry"; \
-		twine upload --repository-url https://test.pypi.org/legacy/ "dist/detectiq-$$VERSION-py3-none-any.whl" "dist/detectiq-$$VERSION.tar.gz"; \
-	fi
-
-.PHONY: _safety-check
-_safety-check:
-	@echo "Checking for .env files that shouldn't be committed or packaged..."
-	@if find . -type f -path "**/.env" ! -path "./.venv/**" | grep -q .; then \
-		echo "⚠️ WARNING: .env files found outside of .venv:"; \
-		find . -type f -path "**/.env" ! -path "./.venv/**"; \
-		echo "These files may contain secrets and should not be committed or packaged."; \
-		echo "Make sure they are in .gitignore and excluded in MANIFEST.in and pyproject.toml."; \
-	else \
-		echo "✓ No problematic .env files found."; \
-	fi
-	@if find . -type f -name ".env.*" ! -name ".env.example" | grep -q .; then \
-		echo "⚠️ WARNING: .env.* files (other than .env.example) found:"; \
-		find . -type f -name ".env.*" ! -name ".env.example"; \
-		echo "These files may contain secrets and should not be committed or packaged."; \
-	else \
-		echo "✓ No problematic .env.* files found."; \
-	fi
