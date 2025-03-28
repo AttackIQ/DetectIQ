@@ -1,15 +1,14 @@
+import aiofiles
+import aiohttp
 import asyncio
+import plyara
 import re
 import shutil
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-import aiofiles
-import aiohttp
-import plyara
 from plyara.utils import rebuild_yara_rule
+from typing import Any, Dict, List, Optional, Tuple
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS
@@ -357,14 +356,14 @@ class YaraRuleUpdater:
                 license_text = content[: match.start()].strip()
 
                 # Create licenses directory if it doesn't exist
-                license_dir = Path(DEFAULT_DIRS.BASE_DIR) / Path("licenses/yara")
+                license_dir = Path(DEFAULT_DIRS.DATA_DIR) / Path("licenses/yara")
                 license_dir.mkdir(parents=True, exist_ok=True)
 
                 # Save license
                 async with aiofiles.open(license_dir / "yaraforge.txt", "w") as f:
                     await f.write(license_text)
 
-                logger.info("YARA license extracted and saved successfully")
+                logger.info(f"YARA license extracted and saved to {license_dir}/yaraforge.txt")
             else:
                 logger.warning("Could not find license text in YARA rules file")
 

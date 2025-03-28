@@ -1,12 +1,11 @@
+import aiofiles
+import aiohttp
 import shutil
 import zipfile
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-import aiofiles
-import aiohttp
 from ruamel.yaml import YAML
+from typing import Any, Dict, List, Optional, Tuple
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS
@@ -74,8 +73,8 @@ class SigmaRuleUpdater:
     async def _save_drl_license(self) -> None:
         """Download and save the Detection Rule License."""
         try:
-            # Create licenses directory if it doesn't exist
-            license_dir = Path(DEFAULT_DIRS.BASE_DIR) / Path("licenses/sigma")
+            # Create licenses directory if it doesn't exist - using DATA_DIR instead of BASE_DIR
+            license_dir = Path(DEFAULT_DIRS.DATA_DIR) / Path("licenses/sigma")
             license_dir.mkdir(parents=True, exist_ok=True)
 
             # Download and save the DRL
@@ -87,7 +86,7 @@ class SigmaRuleUpdater:
                     # Save to drl.md
                     async with aiofiles.open(license_dir / "drl.md", "w") as f:
                         await f.write(content)
-                    logger.info("Saved Detection Rule License to licenses/sigma/drl.md")
+                    logger.info(f"Saved Detection Rule License to {license_dir}/drl.md")
 
         except Exception as e:
             logger.error(f"Failed to save Detection Rule License: {e}")

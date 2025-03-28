@@ -1,11 +1,10 @@
 import json
-import os
-from pathlib import Path
-from typing import Any, Optional
-
 import keyring
-from dotenv import load_dotenv
+import os
+from dotenv import load_dotenv, find_dotenv
+from pathlib import Path
 from pydantic import BaseModel, Field, SecretStr
+from typing import Any, Optional
 
 from detectiq.core.integrations.elastic import ElasticCredentials
 from detectiq.core.integrations.microsoft_xdr import MicrosoftXDRCredentials
@@ -15,8 +14,7 @@ from detectiq.globals import DEFAULT_DIRS
 
 logger = get_logger(__name__)
 
-
-load_dotenv()
+load_dotenv(find_dotenv())
 
 
 class IntegrationCredentials(BaseModel):
@@ -91,12 +89,14 @@ class DetectIQConfig(BaseModel):
 class ConfigManager:
     APP_NAME = "detectiq"
     PROJECT_ROOT = Path(DEFAULT_DIRS.BASE_DIR)
-    CONFIG_FILE = PROJECT_ROOT / "config.json"
+    CONFIG_FILE = Path(DEFAULT_DIRS.DATA_DIR) / "config.json"
 
     def __init__(self):
         logger.info(f"Initializing ConfigManager. Config file: {self.CONFIG_FILE}")
         self.config = self._load_config()
         if not self.CONFIG_FILE.exists():
+            # Ensure parent directory exists
+            self.CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
             self.save_config()
 
     def _load_config(self) -> DetectIQConfig:
@@ -147,6 +147,11 @@ class ConfigManager:
     def _update_from_file(self, config_dict: dict) -> None:
         with open(self.CONFIG_FILE) as f:
             file_config = json.load(f)
+
+            # Ensure openai_api_key is a string if it exists in the file
+            if "openai_api_key" in file_config and file_config["openai_api_key"] is None:
+                file_config["openai_api_key"] = ""
+
             config_dict.update(file_config)
 
 

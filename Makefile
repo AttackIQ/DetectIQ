@@ -265,7 +265,7 @@ format/backend: ## Format and lint backend Python code using black and ruff
 	@echo "Formatting Python files with black..."
 	poetry run black $(PYTHON_FILES)
 	@echo "Running Ruff linter..."
-	poetry run ruff check $(PYTHON_FILES) || true
+	poetry run ruff check --ignore I001 $(PYTHON_FILES) || true
 	@echo "Formatting and linting completed"
 
 # TEST TARGET

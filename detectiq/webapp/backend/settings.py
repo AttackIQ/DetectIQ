@@ -1,7 +1,6 @@
+import environ
 import os
 from pathlib import Path
-
-import environ
 from pydantic import BaseModel, Field
 
 from detectiq.core.config import config_manager
@@ -16,11 +15,16 @@ env = environ.Env(
 
 # Base directory
 BASE_DIR = DEFAULT_DIRS.BASE_DIR
+DATA_DIR = DEFAULT_DIRS.DATA_DIR
 
-# Load environment variables from .env file
-env_file = BASE_DIR / ".env"
-if env_file.exists():
-    env.read_env(env_file)
+# Ensure logs directory exists
+log_dir = DATA_DIR / "logs"
+log_dir.mkdir(parents=True, exist_ok=True)
+
+# Load environment variables from .env files - try multiple locations
+for env_path in [BASE_DIR / ".env", DATA_DIR / ".env"]:
+    if env_path.exists():
+        env.read_env(env_path)
 
 # Django settings
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -60,7 +64,7 @@ WSGI_APPLICATION = "detectiq.webapp.backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": DEFAULT_DIRS.DATA_DIR / "db.sqlite3",
     }
 }
 
@@ -134,7 +138,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": "django-debug.log",
+            "filename": str(DATA_DIR / "logs/django-debug.log"),
             "level": "INFO",
         },
     },
