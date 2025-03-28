@@ -91,7 +91,13 @@ install: install/backend install/frontend/dependencies ## Install both backend (
 
 # RESTART TARGETS
 .PHONY: restart
-restart: stop start ## Restart both servers
+restart: ## Restart both servers (faster than stop+start)
+	@echo "\033[1;33m[*] Fast-restarting both servers\033[0m"
+	@$(MAKE) restart/backend
+	@$(MAKE) restart/frontend
+	@echo "\033[1;32m[✓] All servers restarted\033[0m"
+	@echo "\033[1;32m[✓] Backend server running at http://localhost:8000\033[0m"
+	@echo "\033[1;32m[✓] Frontend server running at http://localhost:3000\033[0m"
 
 .PHONY: restart/frontend
 restart/frontend: ## Restart only the frontend server
@@ -99,7 +105,7 @@ restart/frontend: ## Restart only the frontend server
 	@if lsof -ti:3000 >/dev/null 2>&1; then \
 		echo "Stopping frontend server..."; \
 		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
-		sleep 2; \
+		sleep 1; \
 	fi
 	@$(MAKE) start/frontend
 
@@ -109,9 +115,21 @@ restart/backend: ## Restart only the backend server
 	@if lsof -ti:8000 >/dev/null 2>&1; then \
 		echo "Stopping backend server..."; \
 		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-		sleep 2; \
+		sleep 1; \
 	fi
-	@$(MAKE) start/backend
+	@cd detectiq/webapp/backend &&\
+	poetry run python manage.py runserver 2>&1 &
+	@# Wait for server to start and check if it's running
+	@for i in {1..5}; do \
+		if curl -s http://localhost:8000/ >/dev/null 2>&1; then \
+			echo "\033[1;32m[✓] Backend server restarted successfully\033[0m"; \
+			break; \
+		fi; \
+		if [ $$i -eq 5 ]; then \
+			echo "\033[1;31m[!] Backend server taking longer than expected to restart\033[0m"; \
+		fi; \
+		sleep 0.5; \
+	done
 
 # START TARGETS
 start/backend: 
@@ -120,7 +138,7 @@ start/backend:
 	@if lsof -i:8000 >/dev/null 2>&1; then \
 		echo "\033[1;31m[!] Port 8000 is already in use. Attempting to kill the process...\033[0m"; \
 		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-		sleep 2; \
+		sleep 1; \
 	fi
 	@# Start the backend server
 	cd detectiq/webapp/backend &&\
@@ -212,19 +230,33 @@ stop: ## Stop both backend (Django:8000) and frontend (Next.js:3000) servers
 
 # LOGS TARGET
 .PHONY: logs
-logs: ## Show both backend (Django) and frontend (Next.js) server logs
-	@echo "\033[1;33m[*] Showing server logs\033[0m"
-	@echo "\nBackend server logs:"
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		ps aux | grep "python manage.py runserver" | grep -v grep; \
-	else \
-		echo "Backend server is not running"; \
+logs: ## Show real-time logs for both backend and frontend (Ctrl+C to exit)
+	@echo "\033[1;33m[*] Showing server logs (Ctrl+C to exit)\033[0m"
+	@# Check if any servers are running
+	@if ! lsof -ti:8000 >/dev/null 2>&1 && ! lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "\033[1;33m[!] Warning: No servers are currently running\033[0m"; \
+		echo "\033[1;34m[i] Start servers with 'make start'\033[0m"; \
 	fi
-	@echo "\nFrontend server logs:"
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		ps aux | grep "next dev" | grep -v grep; \
+	@# Backend logs
+	@echo "\033[1;34m[i] Backend (Django) logs:\033[0m"
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		BACKEND_PID=$$(lsof -ti:8000); \
+		echo "\033[1;32m[✓] Backend server is running\033[0m"; \
+		tail -n 50 -f "/proc/$${BACKEND_PID}/fd/1" 2>/dev/null || echo "Cannot access backend logs directly"; \
 	else \
-		echo "Frontend server is not running"; \
+		echo "\033[1;33m[!] Backend server is not running\033[0m"; \
+	fi
+	@# Frontend logs
+	@echo "\033[1;34m[i] Frontend (Next.js) logs:\033[0m"
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "\033[1;32m[✓] Frontend server is running\033[0m"; \
+		if [ -f "/tmp/frontend-server.log" ]; then \
+			tail -n 50 -f "/tmp/frontend-server.log"; \
+		else \
+			echo "Frontend log file not found"; \
+		fi; \
+	else \
+		echo "\033[1;33m[!] Frontend server is not running\033[0m"; \
 	fi
 
 # FORMAT TARGET
