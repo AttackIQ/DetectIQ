@@ -13,7 +13,7 @@ PYTHON_FILES := $(shell find $(SRC_DIRS) -type f -name "*.py" 2>/dev/null | grep
 # Default target is help
 .DEFAULT_GOAL := help
 
-# Help target - only shows available commands, doesn't execute anything
+# HELP TARGET
 .PHONY: help
 help: ## Show this help message
 	@echo "Usage:"
@@ -89,6 +89,30 @@ install/frontend/dependencies:
 install: install/backend install/frontend/dependencies ## Install both backend (Django) and frontend (Next.js) dependencies
 	@echo "\033[1;32m[!] Installing '${APP_NAME}'\033[0m"
 
+# RESTART TARGETS
+.PHONY: restart
+restart: stop start ## Restart both servers
+
+.PHONY: restart/frontend
+restart/frontend: ## Restart only the frontend server
+	@echo "\033[1;33m[*] Restarting frontend server\033[0m"
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "Stopping frontend server..."; \
+		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@$(MAKE) start/frontend
+
+.PHONY: restart/backend
+restart/backend: ## Restart only the backend server
+	@echo "\033[1;33m[*] Restarting backend server\033[0m"
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		echo "Stopping backend server..."; \
+		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@$(MAKE) start/backend
+
 # START TARGETS
 start/backend: 
 	@echo "\033[1;33m[*] Starting '$(APP_NAME)' backend\033[0m"
@@ -128,57 +152,30 @@ start/frontend:
 		echo "\033[1;31m[!] Next.js not found. Please run 'make install/frontend/dependencies' first.\033[0m"; \
 		exit 1; \
 	fi
-	@# Start the frontend server with better error handling
+	@# Start the frontend server with better error handling - now runs in background
 	cd detectiq/webapp/frontend && \
-	(npm run dev 2>&1 || \
-		(echo "\033[1;31m[!] Failed to start frontend server. Trying to fix dependencies...\033[0m" && \
-		rm -rf node_modules/.next && \
-		npm install && \
-		npm run dev))
+	(npm run dev > /tmp/frontend-server.log 2>&1 &) 
+	@# Wait for server to start
+	@echo "Waiting for frontend server to start..."
+	@for i in {1..10}; do \
+		if curl -s http://localhost:3000/ >/dev/null 2>&1; then \
+			echo "\033[1;32m[✓] Frontend server started successfully\033[0m"; \
+			break; \
+		fi; \
+		if [ $$i -eq 10 ]; then \
+			echo "\033[1;31m[!] Warning: Could not confirm frontend server started (still starting?)\033[0m"; \
+		fi; \
+		sleep 1; \
+	done
 
 .PHONY: start
 start: install stop start/backend start/frontend ## Start both backend (Django:8000) and frontend (Next.js:3000) servers
 	@echo "\033[1;33m[*] Running '$(APP_NAME)'\033[0m"
-
-# RESTART TARGETS
-.PHONY: restart
-restart: stop start ## Restart both servers
-
-.PHONY: restart/frontend
-restart/frontend: ## Restart only the frontend server
-	@echo "\033[1;33m[*] Restarting frontend server\033[0m"
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "Stopping frontend server..."; \
-		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
-		sleep 2; \
-	fi
-	@$(MAKE) start/frontend
-
-.PHONY: restart/backend
-restart/backend: ## Restart only the backend server
-	@echo "\033[1;33m[*] Restarting backend server\033[0m"
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "Stopping backend server..."; \
-		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-		sleep 2; \
-	fi
-	@$(MAKE) start/backend
-
-# STOP TARGET
-.PHONY: stop
-stop: ## Stop both backend (Django:8000) and frontend (Next.js:3000) servers
-	@echo "\033[1;33m[*] Stopping all servers\033[0m"
-	@# Kill Django backend server
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "Stopping backend server..."; \
-		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-	fi
-	@# Kill Next.js frontend server
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "Stopping frontend server..."; \
-		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
-	fi
-	@echo "\033[1;32m[✓] All servers stopped\033[0m"
+	@echo "\033[1;32m[✓] Backend server running at http://localhost:8000\033[0m"
+	@echo "\033[1;32m[✓] Frontend server running at http://localhost:3000\033[0m"
+	@echo "\033[1;34m[i] Use 'make logs' to view server logs\033[0m"
+	@echo "\033[1;34m[i] Use 'make status' to check server status\033[0m"
+	@echo "\033[1;34m[i] Use 'make stop' to stop servers\033[0m"
 
 # STATUS TARGET
 .PHONY: status
@@ -197,6 +194,22 @@ status: ## Check status of both backend (Django:8000) and frontend (Next.js:3000
 		echo "\033[1;31m[✗] Not running\033[0m"; \
 	fi
 
+# STOP TARGET
+.PHONY: stop
+stop: ## Stop both backend (Django:8000) and frontend (Next.js:3000) servers
+	@echo "\033[1;33m[*] Stopping all servers\033[0m"
+	@# Kill Django backend server
+	@if lsof -ti:8000 >/dev/null 2>&1; then \
+		echo "Stopping backend server..."; \
+		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
+	fi
+	@# Kill Next.js frontend server
+	@if lsof -ti:3000 >/dev/null 2>&1; then \
+		echo "Stopping frontend server..."; \
+		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
+	fi
+	@echo "\033[1;32m[✓] All servers stopped\033[0m"
+
 # LOGS TARGET
 .PHONY: logs
 logs: ## Show both backend (Django) and frontend (Next.js) server logs
@@ -214,14 +227,7 @@ logs: ## Show both backend (Django) and frontend (Next.js) server logs
 		echo "Frontend server is not running"; \
 	fi
 
-# TEST TARGET
-.PHONY: test
-test: _lock ## Run backend tests with coverage (installs test dependencies if needed)
-	@echo "Installing test dependencies..."
-	poetry install --with dev
-	@echo "Running tests with coverage..."
-	poetry run pytest tests/ --cov=detectiq --cov-report=term-missing
-
+# FORMAT TARGET
 .PHONY: format/backend
 format/backend: ## Format and lint backend Python code using black and ruff
 	@echo "Formatting Python files with black..."
@@ -229,6 +235,14 @@ format/backend: ## Format and lint backend Python code using black and ruff
 	@echo "Running Ruff linter..."
 	poetry run ruff check $(PYTHON_FILES) || true
 	@echo "Formatting and linting completed"
+
+# TEST TARGET
+.PHONY: test
+test: _lock ## Run backend tests with coverage (installs test dependencies if needed)
+	@echo "Installing test dependencies..."
+	poetry install --with dev
+	@echo "Running tests with coverage..."
+	poetry run pytest tests/ --cov=detectiq --cov-report=term-missing
 
 # TOKEN TARGETS
 .PHONY: token-check
@@ -303,3 +317,11 @@ _sync-version:
 _lock:
 	@echo "Updating poetry.lock file..."
 	poetry lock
+
+# PUBLISH TARGET
+.PHONY: publish
+publish: token-check clean ## Build and publish package to PyPI
+	@echo "\033[1;33m[*] Building and publishing '$(APP_NAME)' to PyPI\033[0m"
+	poetry build
+	poetry publish
+	@echo "\033[1;32m[✓] Published to PyPI successfully\033[0m"
