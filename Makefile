@@ -81,6 +81,17 @@ install/backend/dependencies: ensure-poetry-env
 	@echo "\033[1;33m[*] Installing '$(APP_NAME)' backend dependencies\033[0m"
 	poetry install --all-extras
 
+.PHONY: update
+update: ensure-poetry-env ## Update all dependencies to their latest versions
+	@echo "\033[1;33m[*] Updating '$(APP_NAME)' dependencies\033[0m"
+	@echo "Updating backend dependencies..."
+	poetry update
+	@if [ -d "detectiq/webapp/frontend" ]; then \
+		echo "Updating frontend dependencies..."; \
+		cd detectiq/webapp/frontend && npm update; \
+	fi
+	@echo "\033[1;32m[✓] Dependencies updated\033[0m"
+
 .PHONY: initialize/rulesets
 initialize/rulesets: ensure-poetry-env ## Initialize all rulesets (long-running operation)
 	@echo "\033[1;33m[*] Initializing rulesets (this may take several minutes)\033[0m"
