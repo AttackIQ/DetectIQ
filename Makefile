@@ -5,13 +5,21 @@ SHELL := /bin/bash
 
 APP_NAME ?= "DetectIQ"
 
-# Define source directories
-SRC_DIRS := detectiq tests
-# Explicitly filter out node_modules from Python files list
-PYTHON_FILES := $(shell find $(SRC_DIRS) -type f -name "*.py" 2>/dev/null | grep -v "node_modules")
+# Define Python files using git ls-files instead of find
+PYTHON_FILES := $(shell git ls-files "*.py")
 
 # Default target is help
 .DEFAULT_GOAL := help
+
+# ENSURE POETRY ENV
+.PHONY: ensure-poetry-env
+ensure-poetry-env: ## Ensure Poetry environment is properly set up
+	@echo "\033[1;34m[i] Ensuring Poetry environment is available...\033[0m"
+	@if ! poetry env info -p >/dev/null 2>&1; then \
+		echo "\033[1;33m[*] Creating virtual environment...\033[0m"; \
+		poetry env use python; \
+	fi
+	@echo "\033[1;32m[✓] Poetry environment: $$(poetry env info -p)\033[0m"
 
 # HELP TARGET
 .PHONY: help
@@ -27,6 +35,17 @@ help: ## Show this help message
 	@echo "    Use .env.example as a template, but keep your .env files private."
 
 # CLEAN TARGETS
+.PHONY: clean/poetry-env
+clean/poetry-env: ## Clean Poetry virtual environment
+	@echo "\033[1;33m[*] Cleaning Poetry virtual environment\033[0m"
+	@if poetry env info -p >/dev/null 2>&1; then \
+		echo "Removing Poetry virtual environment for $(APP_NAME)..."; \
+		poetry env remove $$(poetry env info -p) 2>/dev/null || true; \
+	else \
+		echo "No Poetry environment found for this project."; \
+	fi
+	@echo "\033[1;32m[✓] Poetry environment cleaned\033[0m"
+
 .PHONY: clean/backend
 clean/backend: ## Clean Python-related files and backend build artifacts
 	@echo "\033[1;33m[*] Cleaning backend artifacts\033[0m"
@@ -53,22 +72,29 @@ clean/frontend: ## Clean frontend build artifacts and dependencies
 	@echo "\033[1;32m[✓] Frontend cleaned\033[0m"
 
 .PHONY: clean
-clean: stop clean/backend clean/frontend ## Stop servers and clean both backend and frontend
+clean: stop clean/backend clean/frontend clean/poetry-env ## Stop servers and clean both backend and frontend
 	@echo "\033[1;33m[*] Deep cleaning entire project\033[0m"
 	@echo "\033[1;32m[✓] Project cleaned\033[0m"
 
 # INSTALL TARGETS
-install/backend/dependencies: 
+install/backend/dependencies: ensure-poetry-env
 	@echo "\033[1;33m[*] Installing '$(APP_NAME)' backend dependencies\033[0m"
 	poetry install --all-extras
 
-install/backend: install/backend/dependencies ## Install backend with all dependencies and initialize databases/rulesets
-	@echo "\033[1;33m[*] Building '$(APP_NAME)' backend\033[0m"
+.PHONY: initialize/rulesets
+initialize/rulesets: ensure-poetry-env ## Initialize all rulesets (long-running operation)
+	@echo "\033[1;33m[*] Initializing rulesets (this may take several minutes)\033[0m"
 	cd detectiq/ &&\
-	poetry run python manage.py migrate &&\
 	poetry run python manage.py initialize_rulesets --create_vectorstores &&\
 	poetry run python manage.py initialize_rulesets --rule_types sigma yara &&\
-	poetry run python manage.py initialize_rulesets --rule_types snort --force 
+	poetry run python manage.py initialize_rulesets --rule_types snort --force
+	@echo "\033[1;32m[✓] Rulesets initialized\033[0m"
+
+install/backend: install/backend/dependencies ## Install backend with all dependencies and run migrations
+	@echo "\033[1;33m[*] Building '$(APP_NAME)' backend\033[0m"
+	cd detectiq/ &&\
+	poetry run python manage.py migrate
+	@echo "\033[1;32m[✓] Backend installed (run 'make initialize/rulesets' to initialize or update ruleset data)\033[0m"
 
 install/frontend/dependencies: 
 	@echo "\033[1;33m[*] Installing '$(APP_NAME)' frontend dependencies\033[0m"
@@ -85,9 +111,19 @@ install/frontend/dependencies:
 	npm audit fix --force || true && \
 	npm install
 
+install/frontend: install/frontend/dependencies ## Build frontend (Next.js)
+	@echo "\033[1;33m[*] Building '$(APP_NAME)' frontend\033[0m"
+	@if [ ! -d "detectiq/webapp/frontend" ]; then \
+		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
+		exit 1; \
+	fi
+	cd detectiq/webapp/frontend && \
+	npm run build
+
 .PHONY: install
 install: install/backend install/frontend/dependencies ## Install both backend (Django) and frontend (Next.js) dependencies
-	@echo "\033[1;32m[!] Installing '${APP_NAME}'\033[0m"
+	@echo "\033[1;32m[!] Installing '${APP_NAME}' completed\033[0m"
+	@echo "\033[1;34m[i] To initialize or update rulesets, run 'make initialize/rulesets'\033[0m"
 
 # RESTART TARGETS
 .PHONY: restart
@@ -261,16 +297,21 @@ logs: ## Show real-time logs for both backend and frontend (Ctrl+C to exit)
 
 # FORMAT TARGET
 .PHONY: format/backend
-format/backend: ## Format and lint backend Python code using black and ruff
-	@echo "Formatting Python files with black..."
+format/backend: ensure-poetry-env ## Format and lint backend Python code using black and ruff
+	@echo "Formatting Python files..."
 	poetry run black $(PYTHON_FILES)
 	@echo "Running Ruff linter..."
 	poetry run ruff check --ignore I001 $(PYTHON_FILES) || true
 	@echo "Formatting and linting completed"
 
+.PHONY: ruff-fix
+ruff-fix: ensure-poetry-env ## Run Ruff linter with auto-fixes
+	@echo "Running Ruff linter with auto-fixes..."
+	poetry run ruff check --fix --ignore E501,F401,E402 $(PYTHON_FILES)
+
 # TEST TARGET
 .PHONY: test
-test: _lock ## Run backend tests with coverage (installs test dependencies if needed)
+test: ensure-poetry-env ## Run backend tests with coverage (installs test dependencies if needed)
 	@echo "Installing test dependencies..."
 	poetry install --with dev
 	@echo "Running tests with coverage..."
@@ -278,13 +319,13 @@ test: _lock ## Run backend tests with coverage (installs test dependencies if ne
 
 # TOKEN TARGETS
 .PHONY: token-check
-token-check: ## Check if PyPI token is configured
+token-check: ensure-poetry-env ## Check if PyPI token is configured
 	@echo "Checking PyPI token configuration..."
 	@# First check using poetry config, but suppress error messages
 	@if poetry config pypi-token.pypi 2>/dev/null | grep -q "."; then \
 		echo "✓ PyPI token found"; \
 	else \
-		if python -c "import keyring; keyring.get_password('pypi-token', 'pypi') and print('Token found')" 2>/dev/null | grep -q "Token found"; then \
+		if poetry run python -c "import keyring; keyring.get_password('pypi-token', 'pypi') and print('Token found')" 2>/dev/null | grep -q "Token found"; then \
 			echo "✓ PyPI token found (in keyring)"; \
 		else \
 			echo "PyPI token not configured. Please run:"; \
@@ -297,7 +338,7 @@ token-check: ## Check if PyPI token is configured
 	fi
 
 .PHONY: token-set
-token-set: ## Set PyPI token (Usage: make token-set TOKEN=your-token-here)
+token-set: ensure-poetry-env ## Set PyPI token (Usage: make token-set TOKEN=your-token-here)
 	@if [ -z "$(TOKEN)" ]; then \
 		echo "Error: TOKEN is required. Usage: make token-set TOKEN=your-token-here"; \
 		exit 1; \
@@ -305,40 +346,40 @@ token-set: ## Set PyPI token (Usage: make token-set TOKEN=your-token-here)
 	@echo "Setting PyPI token..."
 	@poetry config pypi-token.pypi "$(TOKEN)"
 	@# Try to store in keyring but don't fail if it doesn't work
-	@python -c "import keyring; keyring.set_password('pypi-token', 'pypi', '$(TOKEN)')" 2>/dev/null || echo "Note: Token stored in poetry config only (keyring backend not available)"
+	@poetry run python -c "import keyring; keyring.set_password('pypi-token', 'pypi', '$(TOKEN)')" 2>/dev/null || echo "Note: Token stored in poetry config only (keyring backend not available)"
 	@echo "Token configured successfully"
 
 .PHONY: token-remove
-token-remove: ## Remove PyPI token configuration
+token-remove: ensure-poetry-env ## Remove PyPI token configuration
 	@echo "Removing PyPI token..."
 	@poetry config --unset pypi-token.pypi 2>/dev/null || true
 	@# Try to remove from keyring but don't fail if it doesn't work
-	@python -c "import keyring; keyring.delete_password('pypi-token', 'pypi')" 2>/dev/null || echo "Note: Keyring backend not available, token removed from poetry config only"
+	@poetry run python -c "import keyring; keyring.delete_password('pypi-token', 'pypi')" 2>/dev/null || echo "Note: Keyring backend not available, token removed from poetry config only"
 	@rm -f ~/.config/pypoetry/auth.toml 2>/dev/null || true
 	@echo "Token removed successfully"
 
 # VERSION TARGETS
 .PHONY: version
-version: ## Display current version
+version: ensure-poetry-env ## Display current version
 	@poetry version
 
 .PHONY: version-patch
-version-patch: ## Bump patch version (0.0.X)
+version-patch: ensure-poetry-env ## Bump patch version (0.0.X)
 	@poetry version patch
 	@$(MAKE) _sync-version
 
 .PHONY: version-minor
-version-minor: ## Bump minor version (0.X.0)
+version-minor: ensure-poetry-env ## Bump minor version (0.X.0)
 	@poetry version minor
 	@$(MAKE) _sync-version
 
 .PHONY: version-major
-version-major: ## Bump major version (X.0.0)
+version-major: ensure-poetry-env ## Bump major version (X.0.0)
 	@poetry version major
 	@$(MAKE) _sync-version
 
 .PHONY: _sync-version
-_sync-version:
+_sync-version: ensure-poetry-env
 	@echo "Syncing versions..."
 	@VERSION=$$(poetry version -s) && \
 	echo "New version: $$VERSION" && \
@@ -346,14 +387,19 @@ _sync-version:
 	rm -f detectiq/__init__.py.bak
 
 .PHONY: _lock
-_lock:
+_lock: ensure-poetry-env
 	@echo "Updating poetry.lock file..."
 	poetry lock
 
 # PUBLISH TARGET
 .PHONY: publish
-publish: token-check clean ## Build and publish package to PyPI
+publish: ensure-poetry-env token-check clean ## Build and publish package to PyPI
 	@echo "\033[1;33m[*] Building and publishing '$(APP_NAME)' to PyPI\033[0m"
+	@# Verify keyring is installed
+	@if ! poetry run pip show keyring >/dev/null 2>&1; then \
+		echo "\033[1;33m[*] Installing keyring...\033[0m"; \
+		poetry run pip install keyring keyrings.alt; \
+	fi
 	poetry build
 	poetry publish
 	@echo "\033[1;32m[✓] Published to PyPI successfully\033[0m"
