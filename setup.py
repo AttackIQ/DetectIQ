@@ -1,6 +1,3 @@
-import os
-import subprocess
-
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
@@ -32,7 +29,8 @@ analysis_requirements = [
     "pefile>=2023.2.7",
     "yara-python>=4.3.1",
     "scapy>=2.5.0",
-    "python-magic>=0.4.27",  # For better file type detection
+    "python-magic>=0.4.27",
+    # For better file type detection
 ]
 
 # Development requirements
@@ -61,7 +59,7 @@ setup(
         "Documentation": "https://github.com/AttackIQ/DetectIQ",
         "Source Code": "https://github.com/AttackIQ/DetectIQ",
     },
-    packages=find_packages(include=['detectiq', 'detectiq.core*'], exclude=['detectiq.webapp*']),
+    packages=find_packages(include=["detectiq", "detectiq.core*"], exclude=["detectiq.webapp*"]),
     install_requires=core_requirements,
     extras_require={
         "splunk": splunk_requirements,

@@ -1,11 +1,8 @@
-import asyncio
+from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from langchain_openai import OpenAIEmbeddings
-
 from detectiq.core.config import config
-from detectiq.core.llm.tools.yara.create_yara_rule import CreateYaraRuleTool
 from detectiq.core.llm.yara_rules import YaraLLM
 from detectiq.core.utils.logging import get_logger
 from detectiq.core.utils.yara.rule_updater import YaraRuleUpdater
@@ -37,7 +34,7 @@ class YaraRulesetManager:
             rule_dir=str(self.rule_dir),
             auto_update=False,
             vector_store_dir=str(self.vector_store_dir),
-            embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+            embedding_model=self.embedding_model,
         )
 
     async def verify_rule(self, rule_content: str, file_content: bytes):

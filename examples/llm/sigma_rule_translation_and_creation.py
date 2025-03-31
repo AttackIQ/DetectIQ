@@ -1,16 +1,15 @@
 # %% This example will demonstrate how to create a Sigma langchain agent chatbot, which can perform various tasks like
 # %% automatically translate a rule for you, and create new rules from a users input.
 import asyncio
-from typing import cast
-
 from langchain.schema.language_model import BaseLanguageModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from typing import cast
 
 from detectiq.core.llm.sigma_rules import SigmaLLM
 from detectiq.core.llm.toolkits.base import create_rule_agent
 from detectiq.core.llm.toolkits.sigma_toolkit import SigmaToolkit
 from detectiq.core.utils.logging import get_logger
-from detectiq.globals import DEFAULT_DIRS
+from detectiq.globals import DEFAULT_DIRS, Config
 
 logger = get_logger(__name__, log_file="sigma_rule_creation.log")
 
@@ -23,7 +22,7 @@ async def initialize_sigma_llm():
 
     # Initialize Sigma LLM with embeddings and LLMs
     sigma_llm = SigmaLLM(
-        embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+        embedding_model=OpenAIEmbeddings(model=Config.EMBEDDING_MODEL),
         agent_llm=agent_llm,
         rule_creation_llm=rule_creation_llm,
         rule_dir=str(DEFAULT_DIRS.SIGMA_RULE_DIR),

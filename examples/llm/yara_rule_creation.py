@@ -5,16 +5,15 @@
 
 import argparse
 import asyncio
-from typing import cast
-
 from langchain.schema.language_model import BaseLanguageModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from typing import cast
 
 from detectiq.core.llm.toolkits.base import create_rule_agent
 from detectiq.core.llm.toolkits.yara_toolkit import YaraToolkit
 from detectiq.core.llm.yara_rules import YaraLLM
 from detectiq.core.utils.logging import get_logger
-from detectiq.globals import DEFAULT_DIRS
+from detectiq.globals import DEFAULT_DIRS, Config
 
 logger = get_logger(__name__, log_file="yara_rule_creation.log")
 
@@ -27,7 +26,7 @@ async def initialize_yara_llm():
 
     # Initialize YARA LLM with embeddings and LLMs
     yara_llm = YaraLLM(
-        embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+        embedding_model=OpenAIEmbeddings(model=Config.EMBEDDING_MODEL),
         agent_llm=agent_llm,
         rule_creation_llm=rule_creation_llm,
         rule_dir=str(DEFAULT_DIRS.YARA_RULE_DIR),
@@ -39,7 +38,7 @@ async def initialize_yara_llm():
         logger.info("Attempting to load existing YARA vectorstore...")
         yara_llm.load_vectordb()
         logger.info("Successfully loaded existing YARA vectorstore")
-    except FileNotFoundError:
+    except FileNotFoundError or RuntimeError:
         logger.info("No existing vectorstore found. Downloading YARA rules and creating new vectorstore...")
         # Download latest YARA rules and create vectorstore
         await yara_llm.update_rules()

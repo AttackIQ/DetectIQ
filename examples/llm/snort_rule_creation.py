@@ -1,15 +1,14 @@
 import argparse
 import asyncio
-from typing import cast
-
 from langchain.schema.language_model import BaseLanguageModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from typing import cast
 
 from detectiq.core.llm.snort_rules import SnortLLM
 from detectiq.core.llm.toolkits.base import create_rule_agent
 from detectiq.core.llm.toolkits.snort_toolkit import SnortToolkit
 from detectiq.core.utils.logging import get_logger
-from detectiq.globals import DEFAULT_DIRS
+from detectiq.globals import DEFAULT_DIRS, Config
 
 # This example will demonstrate how to create a Snort langchain agent chatbot, which can perform various tasks like
 # creating new rules from PCAP analysis or descriptions of network behavior to detect.
@@ -27,7 +26,7 @@ async def initialize_snort_llm():
 
     # Initialize Snort LLM with embeddings and LLMs
     snort_llm = SnortLLM(
-        embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+        embedding_model=OpenAIEmbeddings(model=Config.EMBEDDING_MODEL),
         agent_llm=agent_llm,
         rule_creation_llm=rule_creation_llm,
         rule_dir=str(DEFAULT_DIRS.SNORT_RULE_DIR),

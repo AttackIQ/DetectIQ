@@ -26,14 +26,14 @@ To use this example:
    - setup-embeddings: Create or update embeddings for all rule types
 """
 
+import sys
+
 import argparse
 import asyncio
 import os
-import sys
+from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
 from typing import cast, Dict, Any, Union, Optional
-
-from dotenv import load_dotenv, find_dotenv
 
 # Load environment variables before importing detectiq modules
 load_dotenv(find_dotenv())
@@ -81,16 +81,12 @@ class EmbeddingManager:
             logger.info(f"Successfully loaded existing {llm_type} vector store")
         except (FileNotFoundError, RuntimeError) as e:
             logger.error(f"Failed to load vector store for {llm_type}: {str(e)}")
-            raise RuntimeError(
-                f"Vector store for {llm_type} not found. Run 'setup-embeddings' command first."
-            )
+            raise RuntimeError(f"Vector store for {llm_type} not found. Run 'setup-embeddings' command first.")
 
     def verify_vector_store_exists(self, vector_store_dir: str, rule_type: str) -> None:
         """Verify that a vector store exists before attempting to use it"""
         if not os.path.exists(vector_store_dir) or not os.listdir(vector_store_dir):
-            raise RuntimeError(
-                f"Vector store for {rule_type} not found. Run 'setup-embeddings' command first."
-            )
+            raise RuntimeError(f"Vector store for {rule_type} not found. Run 'setup-embeddings' command first.")
 
 
 class DetectIQClient:
@@ -136,15 +132,11 @@ class DetectIQClient:
         if self._rule_creation_llm is None:
             self._rule_creation_llm = cast(
                 BaseLanguageModel,
-                ChatOpenAI(
-                    temperature=self.temperature, model=self.rule_creation_model_name
-                ),
+                ChatOpenAI(temperature=self.temperature, model=self.rule_creation_model_name),
             )
         return self._rule_creation_llm
 
-    async def _create_llm_instance(
-        self, rule_type: str
-    ) -> Union[SigmaLLM, YaraLLM, SnortLLM]:
+    async def _create_llm_instance(self, rule_type: str) -> Union[SigmaLLM, YaraLLM, SnortLLM]:
         rule_dir = self.rule_dirs.get(rule_type)
         vector_store_dir = self.vector_store_dirs.get(rule_type)
 
@@ -169,14 +161,10 @@ class DetectIQClient:
             vector_store_dir=vector_store_dir,
         )
 
-        await self.embedding_manager.load_vector_store(
-            llm_instance, rule_type.capitalize()
-        )
+        await self.embedding_manager.load_vector_store(llm_instance, rule_type.capitalize())
         return llm_instance
 
-    async def _create_llm_instance_without_store(
-        self, rule_type: str
-    ) -> Union[SigmaLLM, YaraLLM, SnortLLM]:
+    async def _create_llm_instance_without_store(self, rule_type: str) -> Union[SigmaLLM, YaraLLM, SnortLLM]:
         """Create an LLM instance without initializing vector store."""
         rule_dir = self.rule_dirs.get(rule_type)
         vector_store_dir = self.vector_store_dirs.get(rule_type)
@@ -225,9 +213,7 @@ class DetectIQClient:
             llm_instance = await self._create_llm_instance("sigma")
 
             # Create sigma-specific description
-            final_description = self._create_sigma_description(
-                description, file_analysis or {}
-            )
+            final_description = self._create_sigma_description(description, file_analysis or {})
 
             # Create sigma rule
             tool = CreateSigmaRuleTool(
@@ -255,9 +241,7 @@ class DetectIQClient:
             llm_instance = await self._create_llm_instance("yara")
 
             # Create yara-specific description
-            final_description = self._create_yara_description(
-                description, file_analysis or {}
-            )
+            final_description = self._create_yara_description(description, file_analysis or {})
 
             # Create yara rule
             tool = CreateYaraRuleTool(
@@ -265,9 +249,7 @@ class DetectIQClient:
                 yaradb=llm_instance.vectordb,
                 verbose=True,
             )
-            matching_rules = (
-                file_analysis.get("matching_rules", []) if file_analysis else []
-            )
+            matching_rules = file_analysis.get("matching_rules", []) if file_analysis else []
             result = await tool._arun(
                 final_description,
                 file_analysis=file_analysis or {},
@@ -292,9 +274,7 @@ class DetectIQClient:
             llm_instance = await self._create_llm_instance("snort")
 
             # Create snort-specific description
-            final_description = self._create_snort_description(
-                description, file_analysis or {}
-            )
+            final_description = self._create_snort_description(description, file_analysis or {})
 
             # Create snort rule
             tool = CreateSnortRuleTool(
@@ -302,9 +282,7 @@ class DetectIQClient:
                 snortdb=llm_instance.vectordb,
                 verbose=True,
             )
-            result = await tool._arun(
-                final_description, file_analysis=file_analysis or {}
-            )
+            result = await tool._arun(final_description, file_analysis=file_analysis or {})
 
             return result
         except RuntimeError as e:
@@ -323,9 +301,7 @@ class DetectIQClient:
         if not description:
             filename = file_analysis.get("file_info", {}).get("filename", "")
             if filename:
-                description = (
-                    f"Create a Sigma rule based on the log patterns in {filename}"
-                )
+                description = f"Create a Sigma rule based on the log patterns in {filename}"
             else:
                 description = "Create a SIGMA rule"
 
@@ -333,9 +309,7 @@ class DetectIQClient:
 
         # Add insights specific to log data
         if file_analysis.get("insights"):
-            insights = "\n".join(
-                [f"- {insight}" for insight in file_analysis.get("insights", [])]
-            )
+            insights = "\n".join([f"- {insight}" for insight in file_analysis.get("insights", [])])
             enhanced_description += f"\n\nLog analysis insights:\n{insights}"
 
         # Add log-specific file information
@@ -362,9 +336,7 @@ class DetectIQClient:
 
         # Add insights specifically for binary analysis
         if file_analysis.get("insights"):
-            insights = "\n".join(
-                [f"- {insight}" for insight in file_analysis.get("insights", [])]
-            )
+            insights = "\n".join([f"- {insight}" for insight in file_analysis.get("insights", [])])
             enhanced_description += f"\n\nBinary analysis insights:\n{insights}"
 
         # Add binary-specific file information
@@ -389,9 +361,7 @@ class DetectIQClient:
         if not description:
             filename = file_analysis.get("file_info", {}).get("filename", "")
             if filename:
-                description = (
-                    f"Create a Snort rule based on the traffic patterns in {filename}"
-                )
+                description = f"Create a Snort rule based on the traffic patterns in {filename}"
             else:
                 description = "Create a SNORT rule"
 
@@ -399,9 +369,7 @@ class DetectIQClient:
 
         # Add insights specifically for network traffic
         if file_analysis.get("insights"):
-            insights = "\n".join(
-                [f"- {insight}" for insight in file_analysis.get("insights", [])]
-            )
+            insights = "\n".join([f"- {insight}" for insight in file_analysis.get("insights", [])])
             enhanced_description += f"\n\nNetwork traffic insights:\n{insights}"
 
         # Add network-specific information
@@ -418,14 +386,8 @@ class DetectIQClient:
 
         return enhanced_description
 
-    async def _process_rule_result(
-        self, rule_type: str, result: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        rule_content = (
-            result.get("rule", "")
-            or result.get("content", "")
-            or result.get("output", "")
-        )
+    async def _process_rule_result(self, rule_type: str, result: Dict[str, Any]) -> Dict[str, Any]:
+        rule_content = result.get("rule", "") or result.get("content", "") or result.get("output", "")
         title = result.get("title", "Untitled Rule")
 
         rule_file_path = await self._save_rule_to_file(rule_type, title, rule_content)
@@ -438,9 +400,7 @@ class DetectIQClient:
             "result": result,
         }
 
-    async def _save_rule_to_file(
-        self, rule_type: str, title: str, content: str
-    ) -> Path:
+    async def _save_rule_to_file(self, rule_type: str, title: str, content: str) -> Path:
         rule_file_name = self._create_safe_filename(title)
 
         extensions = {"sigma": ".yml", "yara": ".yar", "snort": ".rules"}
@@ -457,16 +417,12 @@ class DetectIQClient:
         return rule_file_path
 
     def _create_safe_filename(self, title: str) -> str:
-        safe_name = "".join(
-            c for c in title if c.isalnum() or c in (" ", "-", "_")
-        ).strip()
+        safe_name = "".join(c for c in title if c.isalnum() or c in (" ", "-", "_")).strip()
         safe_name = safe_name.replace(" ", "_").lower()
         return safe_name
 
     # Public API methods
-    async def create_sigma_rule(
-        self, description: str, file_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def create_sigma_rule(self, description: str, file_path: Optional[str] = None) -> Dict[str, Any]:
         if file_path:
             file_path_obj = Path(file_path)
             if not file_path_obj.exists():
@@ -479,9 +435,7 @@ class DetectIQClient:
 
         return await self._process_rule_result("sigma", result)
 
-    async def create_yara_rule(
-        self, description: str, file_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def create_yara_rule(self, description: str, file_path: Optional[str] = None) -> Dict[str, Any]:
         if file_path:
             file_path_obj = Path(file_path)
             if not file_path_obj.exists():
@@ -494,9 +448,7 @@ class DetectIQClient:
 
         return await self._process_rule_result("yara", result)
 
-    async def create_snort_rule(
-        self, description: str, file_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def create_snort_rule(self, description: str, file_path: Optional[str] = None) -> Dict[str, Any]:
         if file_path:
             file_path_obj = Path(file_path)
             if not file_path_obj.exists():
@@ -510,9 +462,7 @@ class DetectIQClient:
         return await self._process_rule_result("snort", result)
 
 
-async def create_rule(
-    rule_type: str, description: str, file_path: Optional[str] = None
-):
+async def create_rule(rule_type: str, description: str, file_path: Optional[str] = None):
     """Create a rule of specified type with optional file input."""
     client = DetectIQClient()
 
@@ -545,9 +495,7 @@ async def setup_embeddings():
     for rule_type in rule_types:
         print(f"\nInitializing {rule_type} embeddings...")
         llm_instance = await client._create_llm_instance_without_store(rule_type)
-        await client.embedding_manager.create_vector_store(
-            llm_instance, rule_type.capitalize()
-        )
+        await client.embedding_manager.create_vector_store(llm_instance, rule_type.capitalize())
         print(f"{rule_type.capitalize()} embeddings created successfully.")
 
     print("\nAll embeddings have been created successfully.")
@@ -555,22 +503,16 @@ async def setup_embeddings():
 
 
 def setup_argparse():
-    parser = argparse.ArgumentParser(
-        description="DetectIQ CLI for creating security detection rules"
-    )
+    parser = argparse.ArgumentParser(description="DetectIQ CLI for creating security detection rules")
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Setup embeddings command
-    subparsers.add_parser(
-        "setup-embeddings", help="Create or update embeddings for all rule types"
-    )
+    subparsers.add_parser("setup-embeddings", help="Create or update embeddings for all rule types")
 
     # Sigma rule command
     sigma_parser = subparsers.add_parser("sigma", help="Create a Sigma rule")
-    sigma_parser.add_argument(
-        "description", help="Description of the Sigma rule to create"
-    )
+    sigma_parser.add_argument("description", help="Description of the Sigma rule to create")
     sigma_parser.add_argument(
         "--file",
         "-f",
@@ -580,9 +522,7 @@ def setup_argparse():
 
     # YARA rule command
     yara_parser = subparsers.add_parser("yara", help="Create a YARA rule")
-    yara_parser.add_argument(
-        "description", help="Description of the YARA rule to create"
-    )
+    yara_parser.add_argument("description", help="Description of the YARA rule to create")
     yara_parser.add_argument(
         "--file",
         "-f",
@@ -592,9 +532,7 @@ def setup_argparse():
 
     # Snort rule command
     snort_parser = subparsers.add_parser("snort", help="Create a Snort rule")
-    snort_parser.add_argument(
-        "description", help="Description of the Snort rule to create"
-    )
+    snort_parser.add_argument("description", help="Description of the Snort rule to create")
     snort_parser.add_argument(
         "--file",
         "-f",
@@ -611,8 +549,7 @@ async def main():
     if "-h" not in sys.argv and "--help" not in sys.argv:
         if not os.environ.get("OPENAI_API_KEY"):
             raise ValueError(
-                "OPENAI_API_KEY not found in environment variables. "
-                "Please set it in your .env file or environment."
+                "OPENAI_API_KEY not found in environment variables. " "Please set it in your .env file or environment."
             )
 
     parser = setup_argparse()
@@ -638,9 +575,7 @@ async def main():
     except RuntimeError as e:
         print(f"Error: {str(e)}")
         if "Vector store" in str(e) and "not found" in str(e):
-            print(
-                "\nYou need to run 'setup-embeddings' command first before creating rules."
-            )
+            print("\nYou need to run 'setup-embeddings' command first before creating rules.")
             print("Command: python main.py setup-embeddings")
     except Exception as e:
         print(f"Error: {str(e)}")
