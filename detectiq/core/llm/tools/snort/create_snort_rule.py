@@ -126,11 +126,9 @@ Remember:
 
 Output Format: 
 
-You MUST provide your response in the following format, including the '=== <section title> ===' titles:
+You MUST provide your response in the following format, using standard markdown headings:
 
-+ IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
-
-=== Analysis Summary ===
+#### Analysis Summary
 [Provide a detailed analysis of:
 1. Network traffic patterns and protocols identified
 2. Key indicators of malicious behavior
@@ -138,7 +136,7 @@ You MUST provide your response in the following format, including the '=== <sect
 4. Content patterns and their significance
 5. Protocol-specific behaviors]
 
-=== Detection Strategy ===
+#### Detection Strategy
 [Explain in detail:
 1. Why specific detection methods were chosen
 2. How the rule options work together
@@ -147,10 +145,10 @@ You MUST provide your response in the following format, including the '=== <sect
 5. Performance considerations
 6. Any limitations or edge cases]
 
-=== Rule Description ===
+### Rule Description
 [Provide a clear and concise description of the rule's purpose, what it is detecting, and any other relevant details]
 
-=== Snort Rule ===
+#### Snort Rule
 [Provide the Snort rule(s) following Snort 3 syntax]
 """
 
@@ -178,15 +176,15 @@ You MUST provide your response in the following format, including the '=== <sect
                     rule_text = snort_block_match.group(1).strip()
                 else:
                     # Fallback to section extraction
-                    snort_match = re.search(r"=== Snort Rule ===\n(.*?)(?=\n===|$)", result, re.DOTALL)
+                    snort_match = re.search(r"#### Snort Rule\n(.*?)(?=\n####|$)", result, re.DOTALL)
                     if not snort_match:
                         raise ValueError("Could not extract Snort Rule from response")
                     rule_text = snort_match.group(1).strip()
 
                 # Extract the analysis sections
-                analysis_summary = re.search(r"=== Analysis Summary ===\n(.*?)(?=\n===)", result, re.DOTALL)
-                detection_strategy = re.search(r"=== Detection Strategy ===\n(.*?)(?=\n===)", result, re.DOTALL)
-                rule_description = re.search(r"=== Rule Description ===\n(.*?)(?=\n===)", result, re.DOTALL)
+                analysis_summary = re.search(r"#### Analysis Summary\n(.*?)(?=\n####)", result, re.DOTALL)
+                detection_strategy = re.search(r"#### Detection Strategy\n(.*?)(?=\n####)", result, re.DOTALL)
+                rule_description = re.search(r"#### Rule Description\n(.*?)(?=\n####)", result, re.DOTALL)
 
                 if not analysis_summary or not detection_strategy:
                     logger.warning("Missing required analysis sections in response")
@@ -194,8 +192,8 @@ You MUST provide your response in the following format, including the '=== <sect
 
                 # Combine analysis sections for agent output
                 agent_output = ""
-                agent_output += "=== Analysis Summary ===\n" + analysis_summary.group(1).strip() + "\n\n"
-                agent_output += "=== Detection Strategy ===\n" + detection_strategy.group(1).strip()
+                agent_output += "#### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
+                agent_output += "#### Detection Strategy\n" + detection_strategy.group(1).strip()
 
                 if not agent_output.strip():
                     logger.warning("Empty agent output generated")

@@ -87,7 +87,7 @@ or patterns while avoiding false positives.
             # Format matching rules context
             matching_context = ""
             if matching_rules:
-                matching_context = "\n=== Matching YARA Rules ===\n"
+                matching_context = "\n#### Matching YARA Rules\n"
                 for match in matching_rules:
                     matching_context += f"\nRule: {match['rule_name']} (from {match['namespace']})"
                     if match["meta"]:
@@ -97,7 +97,7 @@ or patterns while avoiding false positives.
 
             # Format similar rules context
             similar_context = (
-                "\n=== Similar YARA Rules ===\n" + "\n".join(doc.page_content for doc in similar_rules)
+                "\n#### Similar YARA Rules\n" + "\n".join(doc.page_content for doc in similar_rules)
                 if similar_rules
                 else ""
             )
@@ -187,11 +187,11 @@ rule Example_Malware {{
 
 Output Format:
 
-You MUST provide your response in the following format, (including the '=== <section title> ===' and ensuring that each section is detailed):
+You MUST provide your response in the following format, (including the '#### <section title>' and ensuring that each section is detailed):
 
 + IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
 
-=== Analysis Summary ===
+#### Analysis Summary
 
 [Provide a detailed analysis covering:
     1. File Type and Format Analysis
@@ -199,7 +199,7 @@ You MUST provide your response in the following format, (including the '=== <sec
     3. Static Features
     4. Contextual Information]
 
-=== Detection Strategy ===
+#### Detection Strategy
 
 [Explain the detection approach, including:
     1. Pattern Selection
@@ -208,7 +208,7 @@ You MUST provide your response in the following format, (including the '=== <sec
     4. Rule Optimization
     5. Limitations and Considerations]
 
-=== YARA Rule ===
+#### YARA Rule
 
 [Provide the YARA rule in a code block with valid syntax, e.g., 
 
@@ -243,14 +243,14 @@ All strings that are defined in the strings section MUST be used in the conditio
                     rule_text = yara_block_match.group(1).strip()
                 else:
                     # Fallback to section extraction
-                    yara_match = re.search(r"=== YARA Rule ===\n(.*?)(?=\n===|$)", response, re.DOTALL)
+                    yara_match = re.search(r"#### YARA Rule\n(.*?)(?=\n####|$)", response, re.DOTALL)
                     if not yara_match:
                         raise ValueError("Could not extract YARA rule from response")
                     rule_text = yara_match.group(1).strip()
 
                 # Extract the analysis sections
-                analysis_summary = re.search(r"=== Analysis Summary ===\n(.*?)(?=\n===)", response, re.DOTALL)
-                detection_strategy = re.search(r"=== Detection Strategy ===\n(.*?)(?=\n===)", response, re.DOTALL)
+                analysis_summary = re.search(r"#### Analysis Summary\n(.*?)(?=\n####)", response, re.DOTALL)
+                detection_strategy = re.search(r"#### Detection Strategy\n(.*?)(?=\n####)", response, re.DOTALL)
 
                 if not analysis_summary or not detection_strategy:
                     logger.warning("Missing required analysis sections in response")
@@ -258,8 +258,8 @@ All strings that are defined in the strings section MUST be used in the conditio
 
                 # Combine analysis sections for agent output
                 agent_output = ""
-                agent_output += "=== Analysis Summary ===\n" + analysis_summary.group(1).strip() + "\n\n"
-                agent_output += "=== Detection Strategy ===\n" + detection_strategy.group(1).strip()
+                agent_output += "#### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
+                agent_output += "#### Detection Strategy\n" + detection_strategy.group(1).strip()
 
                 if not agent_output.strip():
                     logger.warning("Empty agent output generated")
