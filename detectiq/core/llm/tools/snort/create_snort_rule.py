@@ -128,6 +128,8 @@ Output Format:
 
 You MUST provide your response in the following format, including the '=== <section title> ===' titles:
 
++ IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
+
 === Analysis Summary ===
 [Provide a detailed analysis of:
 1. Network traffic patterns and protocols identified

@@ -189,6 +189,8 @@ Output Format:
 
 You MUST provide your response in the following format, (including the '=== <section title> ===' and ensuring that each section is detailed):
 
++ IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
+
 === Analysis Summary ===
 
 [Provide a detailed analysis covering:

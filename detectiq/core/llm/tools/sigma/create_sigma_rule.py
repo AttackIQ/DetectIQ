@@ -147,6 +147,8 @@ Follow the Sigma documentation for proper formatting: https://sigmahq.io/docs/ba
 
 The Analysis Summary and Detection Strategy sections are required and must be detailed.
 
++ IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
+
 You MUST provide your response in the following format:
 
 === Analysis Summary ===
