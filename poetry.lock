@@ -202,13 +202,13 @@ files = [
 
 [[package]]
 name = "attackiq-sigmaiq"
-version = "0.4.38"
+version = "0.4.39"
 description = "Wrapper and tools for pySigma and Sigma rules"
 optional = false
 python-versions = "<=3.12,>=3.9"
 files = [
-    {file = "attackiq_sigmaiq-0.4.38-py3-none-any.whl", hash = "sha256:57262f25d92958d3f6f8b9ca22069e47e91fb68327d2d302fba4e35227de814c"},
-    {file = "attackiq_sigmaiq-0.4.38.tar.gz", hash = "sha256:d8491f27fdd38f39f6e83f4cfcec268b322a9ba8d4bc4de43b72a9af038a300e"},
+    {file = "attackiq_sigmaiq-0.4.39-py3-none-any.whl", hash = "sha256:3d2319e806bdf9bfb1f5c691018e71a040122a5bd19102ff0ac338048d6ddb94"},
+    {file = "attackiq_sigmaiq-0.4.39.tar.gz", hash = "sha256:03d1e0a3b8074d7e61c33b0b6c9d315b2d498b484b05afcedc75e1092289e45b"},
 ]
 
 [package.dependencies]
