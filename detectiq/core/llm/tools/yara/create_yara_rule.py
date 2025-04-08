@@ -136,6 +136,7 @@ YARA Rule Creation Guidelines:
 
     Condition Logic:
         Include basic file checks (e.g., uint16(0) == 0x5A4D for PE files).
+        **IMPORTANT**: When using functions from imported modules (like `pe`), ALWAYS prefix the function call with the module name (e.g., use `pe.is_dll()`, NOT `is_dll`; use `pe.exports('func')`, NOT `exports('func')`).
         Combine string matches appropriately (any of, all of).
         Use correct boolean operators (and, or, not).
         Include file size checks when relevant.
@@ -146,6 +147,7 @@ YARA Rule Creation Guidelines:
         Ensure proper spacing and parentheses placement.
         All imports must be utilized in conditions.
         String identifiers must be unique.
+    IMPORTANT: Review the final YARA rule carefully to ensure all identifiers from imported modules (like 'pe') are used correctly (e.g., `pe.is_dll()`) and that all defined strings are referenced in the condition.
 
     Rule References:
         If matching or similar rules are provided, reference them in the metadata.
