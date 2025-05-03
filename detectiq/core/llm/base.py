@@ -103,7 +103,7 @@ class BaseLLMRules(ABC):
         self,
         texts: Optional[List[str]] = None,
         metadatas: Optional[List[Dict[str, Any]]] = None,
-        batch_size: int = DEFAULT_BATCH_SIZE,
+        batch_size: int = 50,
     ) -> None:
         """Create vector store from documents."""
         try:

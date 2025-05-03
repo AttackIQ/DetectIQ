@@ -270,8 +270,12 @@ All strings that are defined in the strings section MUST be used in the conditio
                 # Try to compile the rule
                 try:
                     yara.compile(source=rule_text)
+                except yara.SyntaxError as e:
+                    error_message = f"Syntax Error compiling YARA rule: {str(e)}. Check for common issues like incorrect module usage (e.g., using 'is_pe' instead of 'pe.is_pe' after 'import \"pe\"') or undefined strings."
+                    logger.error(error_message)
+                    raise ValueError(error_message)
                 except yara.Error as e:
-                    logger.error(f"Error in YARA rule: {str(e)}")
+                    logger.error(f"Error compiling YARA rule: {str(e)}")
                     raise ValueError(f"Error compiling YARA rule: {str(e)}")
 
                 # Extract rule name for title and format it
