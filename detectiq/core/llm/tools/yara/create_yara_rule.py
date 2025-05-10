@@ -11,10 +11,29 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.vectorstore import VectorStore
 from langchain.tools import BaseTool
 from pydantic import BaseModel, ConfigDict
+# Import message types for chat history formatting
+from langchain.schema import AIMessage, BaseMessage, HumanMessage 
 
 from detectiq.core.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+# Helper function to format chat history
+def format_chat_history(chat_history: Optional[List[BaseMessage]]) -> str:
+    if not chat_history:
+        return "No prior conversation history."
+    formatted_history = []
+    for msg in chat_history:
+        if isinstance(msg, HumanMessage):
+            formatted_history.append(f"Human: {msg.content}")
+        elif isinstance(msg, AIMessage):
+            formatted_history.append(f"AI: {msg.content}")
+        # You can add more specific types like SystemMessage if needed
+        else:
+            # Generic fallback, though ideally, you'd handle all expected types
+            formatted_history.append(f"{type(msg).__name__}: {msg.content}") 
+    return "\n".join(formatted_history)
 
 
 class CreateYaraRuleInput(BaseModel):
@@ -64,6 +83,7 @@ or patterns while avoiding false positives.
         file_analysis: Optional[Dict[str, Any]] = None,
         matching_rules: Optional[List[Dict]] = None,
         k: int = 3,
+        chat_history: Optional[List[BaseMessage]] = None,
     ) -> Dict[str, Any]:
         """Create a YARA rule based on description or analysis."""
         try:
@@ -114,6 +134,9 @@ Description from user: {description}
 File Analysis: {file_analysis}
 
 Additional Context: {rule_context}
+
+Conversation History:
+{chat_history_formatted}
 
 Similar and matching YARA Rules from Database: {context}
 
@@ -222,20 +245,20 @@ All strings that are defined in the strings section MUST be used in the conditio
 """
 
             prompt = ChatPromptTemplate.from_template(template)
-            chain = (
-                {
-                    "context": lambda x: context_text,
-                    "description": RunnablePassthrough(),
-                    "file_analysis": lambda x: file_analysis or "No file analysis provided.",
-                    "rule_context": lambda x: rule_context or "No additional context provided.",
-                    "current_date": lambda x: current_date,
-                }
-                | prompt
-                | self.llm
-                | StrOutputParser()
-            )
 
-            response = await chain.ainvoke(description)
+            # Prepare the input for the chain
+            chain_input = {
+                "description": description,
+                "file_analysis": file_analysis or "No file analysis provided.",
+                "rule_context": rule_context or "No additional context provided.",
+                "context": context_text,
+                "current_date": current_date,
+                "chat_history_formatted": format_chat_history(chat_history),
+            }
+
+            chain = prompt | self.llm | StrOutputParser()
+
+            response = await chain.ainvoke(chain_input)
 
             # Extract and validate the rule
             try:
