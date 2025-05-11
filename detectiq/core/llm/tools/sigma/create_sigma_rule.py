@@ -71,6 +71,7 @@ class CreateSigmaRuleTool(BaseTool):
         self,
         description: str,
         rule_context: Optional[str] = None,
+        chat_history: Optional[List[Any]] = None,
     ) -> Dict[str, Any]:
         try:
             if self.sigmadb is None:
@@ -89,9 +90,21 @@ class CreateSigmaRuleTool(BaseTool):
             # Format similar rules context
             context_text = "\n".join(doc.page_content for doc in similar_rules)
 
+            # Format chat history for prompt
+            formatted_chat_history = "N/A"
+            if chat_history:
+                history_lines = []
+                for msg in chat_history:
+                    role = "User" if msg.type == "human" else "Assistant"
+                    history_lines.append(f"{role}: {msg.content}")
+                formatted_chat_history = "\n".join(history_lines)
+
             template = """You are an expert in creating Sigma rules.
 
-Given the following description and context, produce a Sigma rule that effectively detects the specified threat while minimizing false positives.
+Given the following description, conversation history, and context, produce a Sigma rule that effectively detects the specified threat while minimizing false positives.
+
+Conversation History:
+{formatted_chat_history}
 
 Context (Similar Rules):
 {context_text}
@@ -99,7 +112,7 @@ Context (Similar Rules):
 Description:
 {description}
 
-Additional Context:
+Additional Context (from file analysis or other sources):
 {rule_context}
 
 Ensure your Sigma rule includes:
@@ -177,6 +190,7 @@ You MUST provide your response in the following format, using standard markdown 
                     "description": RunnablePassthrough(),
                     "rule_context": lambda x: rule_context or "No additional context provided.",
                     "current_date": lambda x: current_date,
+                    "formatted_chat_history": lambda x: formatted_chat_history,
                 }
                 | prompt
                 | self.llm
