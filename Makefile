@@ -84,15 +84,20 @@ install: ensure-poetry-env ## Install backend dependencies and extras
 
 # FORMAT TARGET
 .PHONY: format
-format: ensure-poetry-env ## Format and lint Python code
-	@echo "Formatting and linting Python files using format.py..."
-	poetry run format
-	@echo "Formatting and linting completed"
+format: ensure-poetry-env ## Format Python code with Black
+	@echo "Formatting Python files with Black..."
+	poetry run black . # Use current directory for black, similar to original broader scope
+	@echo "Formatting completed"
+
+.PHONY: ruff
+ruff: ensure-poetry-env ## Run Ruff linter
+	@echo "Running Ruff linter..."
+	poetry run ruff check --ignore E501,F401 $(PYTHON_FILES)
 
 .PHONY: ruff-fix
 ruff-fix: ensure-poetry-env ## Run Ruff linter with auto-fixes
 	@echo "Running Ruff linter with auto-fixes..."
-	poetry run ruff check --fix --ignore E501,F401,E402 $(PYTHON_FILES)
+	poetry run ruff check --fix --ignore E501,F401 $(PYTHON_FILES) # Aligned ignored rules with SigmaIQ
 
 # TEST TARGET
 .PHONY: test
