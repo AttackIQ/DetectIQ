@@ -1,12 +1,13 @@
 # stdlib
 import os
 from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from langchain.embeddings.base import Embeddings
 from langchain.schema.document import Document
 from langchain.schema.language_model import BaseLanguageModel
 from langchain_community.vectorstores import FAISS
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS

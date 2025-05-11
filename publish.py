@@ -2,10 +2,10 @@
 """
 Script to build and publish the package to PyPI.
 """
-import sys
 
 import os
 import subprocess
+import sys
 
 
 def run_command(command):

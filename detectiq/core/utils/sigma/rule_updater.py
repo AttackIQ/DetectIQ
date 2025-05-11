@@ -1,11 +1,12 @@
-import aiofiles
-import aiohttp
 import shutil
 import zipfile
 from io import BytesIO, StringIO
 from pathlib import Path
-from ruamel.yaml import YAML
 from typing import Any, Dict, List, Optional, Tuple
+
+import aiofiles
+import aiohttp
+from ruamel.yaml import YAML
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS

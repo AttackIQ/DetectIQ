@@ -13,7 +13,7 @@ Before publishing to PyPI, ensure you have the following:
    ```
    Alternatively, use the development dependencies:
    ```bash
-   make install-dev
+   make install # Installs dev dependencies including twine, build, keyring if grouped in pyproject.toml
    ```
    
 3. A PyPI token configured for authentication:

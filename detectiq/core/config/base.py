@@ -1,10 +1,11 @@
 import json
-import keyring
 import os
-from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
-from pydantic import BaseModel, Field, SecretStr
 from typing import Any, Optional
+
+import keyring
+from dotenv import find_dotenv, load_dotenv
+from pydantic import BaseModel, Field, SecretStr
 
 from detectiq.core.integrations.elastic import ElasticCredentials
 from detectiq.core.integrations.microsoft_xdr import MicrosoftXDRCredentials

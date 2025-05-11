@@ -5,14 +5,15 @@ from typing import Any, Dict, List, Optional, Type
 
 import yara
 from langchain.prompts import ChatPromptTemplate
+
+# Import message types for chat history formatting
+from langchain.schema import AIMessage, BaseMessage, HumanMessage
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.vectorstore import VectorStore
 from langchain.tools import BaseTool
 from pydantic import BaseModel, ConfigDict
-# Import message types for chat history formatting
-from langchain.schema import AIMessage, BaseMessage, HumanMessage 
 
 from detectiq.core.utils.logging import get_logger
 
@@ -32,7 +33,7 @@ def format_chat_history(chat_history: Optional[List[BaseMessage]]) -> str:
         # You can add more specific types like SystemMessage if needed
         else:
             # Generic fallback, though ideally, you'd handle all expected types
-            formatted_history.append(f"{type(msg).__name__}: {msg.content}") 
+            formatted_history.append(f"{type(msg).__name__}: {msg.content}")
     return "\n".join(formatted_history)
 
 

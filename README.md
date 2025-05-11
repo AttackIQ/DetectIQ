@@ -1,5 +1,5 @@
 # DetectIQ
-DetectIQ is an AI-powered security rule management platform that helps create, analyze, and optimize detection rules across multiple security platforms. It can be used with the provided UI, or just with Python scripts using the self contained `detectiq/core` module. See examples in the [examples](examples/) directory for more information.
+DetectIQ is an AI-powered security rule management platform that helps create, analyze, and optimize detection rules across multiple security platforms. It is primarily used as a Python library (`detectiq.core` module) for integration into your own scripts and tools. See examples in the [examples](examples/) directory for more information.
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: LGPL v2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://www.gnu.org/licenses/lgpl-2.1)
 [![Status: Alpha](https://img.shields.io/badge/Status-Alpha-red.svg)]()
@@ -28,29 +28,30 @@ DetectIQ is an AI-powered security rule management platform that helps create, a
 > We welcome all feedback and contributions, but please use at your own risk!
 
 ## Quickstart
-To get started, run the commands below. For more information, refer to the [docs](docs/README.md)!
+To get started with using DetectIQ as a library:
 
 **Step 1.** Clone the repository.
 ```bash
 git clone https://github.com/AttackIQ/DetectIQ.git
+cd DetectIQ
 ```
 
-**Step 2.** Set your environment variables (using [`.env.example`](.env.example) as a template).
+**Step 2.** Set your environment variables (using [`.env.example`](.env.example) as a template for API keys, e.g., `OPENAI_API_KEY`).
 ```bash
 cp .env.example .env
+# Edit .env with your API keys
 ```
 
-**Step 3.** Run the provided `start.sh` script and pass `install` as an argument.
+**Step 3.** Install the package and its dependencies, preferably in a virtual environment.
 ```bash
-bash start.sh install
+# Using poetry (recommended)
+poetry install --all-extras
+
+# Or using pip
+# pip install .
 ```
 
-**Step 4.** Run the provided `start.sh` script and pass `run` as an argument.
-```bash
-bash start.sh run
-```
-
-**Step 5.** Use your favorite browser to navigate to [http://localhost:3000](http://localhost:3000).
+**Step 4.** Explore the examples in the `examples/` directory to see how to use the library.
 
 ## Current Features
 ### AI-Powered Detection 
@@ -74,7 +75,7 @@ bash start.sh run
 - Implicit log analysis for Sigma rule optimization (Explicit Analysis Coming Soon)
 
 ### Multi-Platform Integration 
-- Automatic Sigma rule translation to various SIEM queries using `pySigma` and `SigmAIQ` wrapper
+- Automatic Sigma rule translation to various SIEM queries leveraging advanced AI models.
 - Seamlessly create Splunk Enterprise Security correlation rules from Sigma rules
 
 ## Road Map
@@ -84,11 +85,7 @@ bash start.sh run
 - [ ] Rule testing and validation
 - [ ] Rule searching, e.g. "Do I have a rule in place that can detect this?"
 - [ ] Deployment tracking and workflow automation
-- [ ] Rule management UI Enhancements
-- [ ] Authentication and Authorization
 - [ ] Project refactoring for production readiness
-- [ ] Chatbot (langchain agents) UI with memory
-- [ ] Docker containerization and deployment
 - [ ] Rule management without OpenAI requirements
 - [ ] More non-webapp examples
 
@@ -186,9 +183,9 @@ For instructions on publishing the package to PyPI, see [PUBLISHING.md](PUBLISHI
 
 ## Environment Configuration
 
-DetectIQ uses environment variables for configuration. A comprehensive example with documentation is provided in [.env.example](.env.example).
+DetectIQ uses environment variables for configuration, primarily for API keys like `OPENAI_API_KEY`. A comprehensive example with documentation is provided in [.env.example](.env.example).
 
-To configure the application:
+To configure the application for use with examples or your own scripts:
 
 1. Copy the example file to `.env`:
    ```bash
@@ -240,27 +237,23 @@ make help
 
 ```bash
 # Installation
-make install/local         # Complete local installation (backend + frontend)
-
-# Running the application
-make run/local             # Run both backend and frontend servers
+make install              # Install package with all extras
 
 # Code quality
-make format               # Format Python files using black
-make ruff                 # Run Ruff linter
+make format               # Format Python files
+make ruff-fix             # Run Ruff linter with auto-fixes
 make test                 # Run tests with coverage
 
 # Package management
-make update               # Update dependencies
+make update               # Update dependencies using Poetry
 make version              # Display current version
 make version-patch        # Bump patch version (0.0.X)
 make version-minor        # Bump minor version (0.X.0)
 make version-major        # Bump major version (X.0.0)
 
 # PyPI publishing
-make pypi-build           # Build package for PyPI
-make pypi-check           # Check package with twine
-make pypi-publish         # Publish to PyPI
+make build                # Build package for PyPI
+make publish              # Publish to PyPI (after versioning and building)
 ```
 
 For more details on publishing the package, see [PUBLISHING.md](PUBLISHING.md).

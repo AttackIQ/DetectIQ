@@ -1,14 +1,15 @@
-import aiofiles
-import aiohttp
 import asyncio
-import plyara
 import re
 import shutil
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from plyara.utils import rebuild_yara_rule
 from typing import Any, Dict, List, Optional, Tuple
+
+import aiofiles
+import aiohttp
+import plyara
+from plyara.utils import rebuild_yara_rule
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS

@@ -31,10 +31,11 @@ make token-set TOKEN=your-pypi-token
 2. Run versioning and publishing:
 ```bash
 make update # will do poetry update
-make install-dev # will do poetry install --with dev
-make test # will do poetry run pytest
+make install # will do poetry install --all-extras (includes dev dependencies if specified via groups or --with dev)
+make test # will do poetry run pytest (also installs dev dependencies)
 make version-patch # or version-minor or version-major
-make pypi-publish # will build and publish to PyPI
+make build # will build the package
+make publish # will publish to PyPI
 ```
 
 For detailed publishing instructions, see [PUBLISHING.md](PUBLISHING.md).

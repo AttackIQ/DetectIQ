@@ -1,11 +1,9 @@
 # Set the shell to bash
 SHELL := /bin/bash
 
-.SILENT: install/backend/dependencies install/frontend/dependencies install/backend start/backend start/frontend run/local dev restart restart/frontend restart/backend clean/backend clean/frontend clean
+.SILENT: install clean format ruff-fix build publish test-publish show-package
 
 APP_NAME ?= "DetectIQ"
-
-# Define Python files using git ls-files instead of find
 PYTHON_FILES := $(shell git ls-files "*.py")
 
 # Default target is help
@@ -46,8 +44,8 @@ clean/poetry-env: ## Clean Poetry virtual environment
 	fi
 	@echo "\033[1;32m[✓] Poetry environment cleaned\033[0m"
 
-.PHONY: clean/backend
-clean/backend: ## Clean Python-related files and backend build artifacts
+.PHONY: clean
+clean: clean/poetry-env ## Clean backend artifacts and Poetry virtual environment
 	@echo "\033[1;33m[*] Cleaning backend artifacts\033[0m"
 	@echo "Cleaning up Python cache files and build artifacts..."
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -57,262 +55,38 @@ clean/backend: ## Clean Python-related files and backend build artifacts
 	rm -rf dist/ build/ 2>/dev/null || true
 	rm -rf .pytest_cache/ .ruff_cache/ .coverage htmlcov/ .mypy_cache/ .tox/ 2>/dev/null || true
 	@echo "\033[1;32m[✓] Backend cleaned\033[0m"
-
-.PHONY: clean/frontend
-clean/frontend: ## Clean frontend build artifacts and dependencies
-	@echo "\033[1;33m[*] Cleaning frontend artifacts\033[0m"
-	@if [ -d "detectiq/webapp/frontend/node_modules" ]; then \
-		echo "Cleaning frontend node_modules..."; \
-		rm -rf detectiq/webapp/frontend/node_modules; \
-	fi
-	@if [ -d "detectiq/webapp/frontend/.next" ]; then \
-		echo "Cleaning frontend .next..."; \
-		rm -rf detectiq/webapp/frontend/.next; \
-	fi
-	@echo "\033[1;32m[✓] Frontend cleaned\033[0m"
-
-.PHONY: clean
-clean: stop clean/backend clean/frontend clean/poetry-env ## Stop servers and clean both backend and frontend
-	@echo "\033[1;33m[*] Deep cleaning entire project\033[0m"
+	@echo "\033[1;33m[*] Deep cleaning project (backend & poetry env)\033[0m"
 	@echo "\033[1;32m[✓] Project cleaned\033[0m"
 
 # INSTALL TARGETS
-install/backend/dependencies: ensure-poetry-env
-	@echo "\033[1;33m[*] Installing '$(APP_NAME)' backend dependencies\033[0m"
-	poetry install --all-extras
-
 .PHONY: update
-update: ensure-poetry-env ## Update all dependencies to their latest versions
-	@echo "\033[1;33m[*] Updating '$(APP_NAME)' dependencies\033[0m"
+update: ensure-poetry-env ## Update all backend dependencies to their latest versions
+	@echo "\033[1;33m[*] Updating '$(APP_NAME)' backend dependencies\033[0m"
 	@echo "Updating backend dependencies..."
 	poetry update
-	@if [ -d "detectiq/webapp/frontend" ]; then \
-		echo "Updating frontend dependencies..."; \
-		cd detectiq/webapp/frontend && npm update; \
-	fi
-	@echo "\033[1;32m[✓] Dependencies updated\033[0m"
+	@echo "\033[1;32m[✓] Backend dependencies updated\033[0m"
 
 .PHONY: initialize/rulesets
 initialize/rulesets: ensure-poetry-env ## Initialize all rulesets (long-running operation)
 	@echo "\033[1;33m[*] Initializing rulesets (this may take several minutes)\033[0m"
-	cd detectiq/ &&\
-	poetry run python manage.py initialize_rulesets --create_vectorstores &&\
-	poetry run python manage.py initialize_rulesets --rule_types sigma yara &&\
-	poetry run python manage.py initialize_rulesets --rule_types snort --force
-	@echo "\033[1;32m[✓] Rulesets initialized\033[0m"
-
-install/backend: install/backend/dependencies ## Install backend with all dependencies and run migrations
-	@echo "\033[1;33m[*] Building '$(APP_NAME)' backend\033[0m"
-	cd detectiq/ &&\
-	poetry run python manage.py migrate
-	@echo "\033[1;32m[✓] Backend installed (run 'make initialize/rulesets' to initialize or update ruleset data)\033[0m"
-
-install/frontend/dependencies: 
-	@echo "\033[1;33m[*] Installing '$(APP_NAME)' frontend dependencies\033[0m"
-	@if ! command -v npm &> /dev/null; then \
-		echo "\033[1;31m[!] npm is not installed. Please install Node.js and npm first.\033[0m"; \
-		exit 1; \
-	fi
-	@if [ ! -d "detectiq/webapp/frontend" ]; then \
-		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
-		exit 1; \
-	fi
-	cd detectiq/webapp/frontend && \
-	npm install && \
-	npm audit fix --force || true && \
-	npm install
-
-install/frontend: install/frontend/dependencies ## Build frontend (Next.js)
-	@echo "\033[1;33m[*] Building '$(APP_NAME)' frontend\033[0m"
-	@if [ ! -d "detectiq/webapp/frontend" ]; then \
-		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
-		exit 1; \
-	fi
-	cd detectiq/webapp/frontend && \
-	npm run build
+	# TODO: Update command to initialize rulesets without Django/manage.py.
+	# The previous command was: poetry run python manage.py initialize_rulesets --rule_types snort --force
+	# This needs to be replaced with a direct script call if the functionality is still required.
+	@echo "\033[1;32m[✓] Rulesets initialization placeholder (command needs update)\033[0m"
 
 .PHONY: install
-install: install/backend install/frontend/dependencies ## Install both backend (Django) and frontend (Next.js) dependencies
-	@echo "\033[1;32m[!] Installing '${APP_NAME}' completed\033[0m"
+install: ensure-poetry-env ## Install backend dependencies and extras
+	@echo "\033[1;33m[*] Installing '$(APP_NAME)' backend dependencies and extras\033[0m"
+	poetry install --all-extras
+	@echo "\033[1;32m[✓] Backend dependencies installed\033[0m"
+	@echo "\033[1;32m[!] Installing '${APP_NAME}' backend completed\033[0m"
 	@echo "\033[1;34m[i] To initialize or update rulesets, run 'make initialize/rulesets'\033[0m"
 
-# RESTART TARGETS
-.PHONY: restart
-restart: ## Restart both servers (faster than stop+start)
-	@echo "\033[1;33m[*] Fast-restarting both servers\033[0m"
-	@$(MAKE) restart/backend
-	@$(MAKE) restart/frontend
-	@echo "\033[1;32m[✓] All servers restarted\033[0m"
-	@echo "\033[1;32m[✓] Backend server running at http://localhost:8000\033[0m"
-	@echo "\033[1;32m[✓] Frontend server running at http://localhost:3000\033[0m"
-
-.PHONY: restart/frontend
-restart/frontend: ## Restart only the frontend server
-	@echo "\033[1;33m[*] Restarting frontend server\033[0m"
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "Stopping frontend server..."; \
-		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
-		sleep 1; \
-	fi
-	@$(MAKE) start/frontend
-
-.PHONY: restart/backend
-restart/backend: ## Restart only the backend server
-	@echo "\033[1;33m[*] Restarting backend server\033[0m"
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "Stopping backend server..."; \
-		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-		sleep 1; \
-	fi
-	@cd detectiq/webapp/backend &&\
-	poetry run python manage.py runserver 2>&1 &
-	@# Wait for server to start and check if it's running
-	@for i in {1..5}; do \
-		if curl -s http://localhost:8000/ >/dev/null 2>&1; then \
-			echo "\033[1;32m[✓] Backend server restarted successfully\033[0m"; \
-			break; \
-		fi; \
-		if [ $$i -eq 5 ]; then \
-			echo "\033[1;31m[!] Backend server taking longer than expected to restart\033[0m"; \
-		fi; \
-		sleep 0.5; \
-	done
-
-# START TARGETS
-start/backend: 
-	@echo "\033[1;33m[*] Starting '$(APP_NAME)' backend\033[0m"
-	@# Check if port 8000 is already in use
-	@if lsof -i:8000 >/dev/null 2>&1; then \
-		echo "\033[1;31m[!] Port 8000 is already in use. Attempting to kill the process...\033[0m"; \
-		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-		sleep 1; \
-	fi
-	@# Start the backend server
-	cd detectiq/webapp/backend &&\
-	poetry run python manage.py runserver 2>&1 &
-	@# Wait for server to start and check if it's running
-	@for i in {1..10}; do \
-		if curl -s http://localhost:8000/ >/dev/null 2>&1; then \
-			echo "\033[1;32m[✓] Backend server started successfully\033[0m"; \
-			break; \
-		fi; \
-		if [ $$i -eq 10 ]; then \
-			echo "\033[1;31m[!] Failed to start backend server\033[0m"; \
-			exit 1; \
-		fi; \
-		sleep 1; \
-	done
-
-start/frontend: 
-	@echo "\033[1;33m[*] Starting '$(APP_NAME)' frontend\033[0m"
-	@if ! command -v npm &> /dev/null; then \
-		echo "\033[1;31m[!] npm is not installed. Please install Node.js and npm first.\033[0m"; \
-		exit 1; \
-	fi
-	@if [ ! -d "detectiq/webapp/frontend" ]; then \
-		echo "\033[1;31m[!] Frontend directory not found at detectiq/webapp/frontend\033[0m"; \
-		exit 1; \
-	fi
-	@if [ ! -f "detectiq/webapp/frontend/node_modules/.bin/next" ]; then \
-		echo "\033[1;31m[!] Next.js not found. Please run 'make install/frontend/dependencies' first.\033[0m"; \
-		exit 1; \
-	fi
-	@# Start the frontend server with better error handling - now runs in background
-	cd detectiq/webapp/frontend && \
-	(npm run dev > /tmp/frontend-server.log 2>&1 &) 
-	@# Wait for server to start
-	@echo "Waiting for frontend server to start..."
-	@for i in {1..10}; do \
-		if curl -s http://localhost:3000/ >/dev/null 2>&1; then \
-			echo "\033[1;32m[✓] Frontend server started successfully\033[0m"; \
-			break; \
-		fi; \
-		if [ $$i -eq 10 ]; then \
-			echo "\033[1;31m[!] Warning: Could not confirm frontend server started (still starting?)\033[0m"; \
-		fi; \
-		sleep 1; \
-	done
-
-.PHONY: start
-start: install stop start/backend start/frontend ## Start both backend (Django:8000) and frontend (Next.js:3000) servers
-	@echo "\033[1;33m[*] Running '$(APP_NAME)'\033[0m"
-	@echo "\033[1;32m[✓] Backend server running at http://localhost:8000\033[0m"
-	@echo "\033[1;32m[✓] Frontend server running at http://localhost:3000\033[0m"
-	@echo "\033[1;34m[i] Use 'make logs' to view server logs\033[0m"
-	@echo "\033[1;34m[i] Use 'make status' to check server status\033[0m"
-	@echo "\033[1;34m[i] Use 'make stop' to stop servers\033[0m"
-
-# STATUS TARGET
-.PHONY: status
-status: ## Check status of both backend (Django:8000) and frontend (Next.js:3000) servers
-	@echo "\033[1;33m[*] Checking server status\033[0m"
-	@echo "\nBackend server (port 8000):"
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "\033[1;32m[✓] Running\033[0m"; \
-	else \
-		echo "\033[1;31m[✗] Not running\033[0m"; \
-	fi
-	@echo "\nFrontend server (port 3000):"
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "\033[1;32m[✓] Running\033[0m"; \
-	else \
-		echo "\033[1;31m[✗] Not running\033[0m"; \
-	fi
-
-# STOP TARGET
-.PHONY: stop
-stop: ## Stop both backend (Django:8000) and frontend (Next.js:3000) servers
-	@echo "\033[1;33m[*] Stopping all servers\033[0m"
-	@# Kill Django backend server
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "Stopping backend server..."; \
-		lsof -ti:8000 | xargs kill -9 2>/dev/null || true; \
-	fi
-	@# Kill Next.js frontend server
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "Stopping frontend server..."; \
-		lsof -ti:3000 | xargs kill -9 2>/dev/null || true; \
-	fi
-	@echo "\033[1;32m[✓] All servers stopped\033[0m"
-
-# LOGS TARGET
-.PHONY: logs
-logs: ## Show real-time logs for both backend and frontend (Ctrl+C to exit)
-	@echo "\033[1;33m[*] Showing server logs (Ctrl+C to exit)\033[0m"
-	@# Check if any servers are running
-	@if ! lsof -ti:8000 >/dev/null 2>&1 && ! lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "\033[1;33m[!] Warning: No servers are currently running\033[0m"; \
-		echo "\033[1;34m[i] Start servers with 'make start'\033[0m"; \
-	fi
-	@# Backend logs
-	@echo "\033[1;34m[i] Backend (Django) logs:\033[0m"
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		BACKEND_PID=$$(lsof -ti:8000); \
-		echo "\033[1;32m[✓] Backend server is running\033[0m"; \
-		tail -n 50 -f "/proc/$${BACKEND_PID}/fd/1" 2>/dev/null || echo "Cannot access backend logs directly"; \
-	else \
-		echo "\033[1;33m[!] Backend server is not running\033[0m"; \
-	fi
-	@# Frontend logs
-	@echo "\033[1;34m[i] Frontend (Next.js) logs:\033[0m"
-	@if lsof -ti:3000 >/dev/null 2>&1; then \
-		echo "\033[1;32m[✓] Frontend server is running\033[0m"; \
-		if [ -f "/tmp/frontend-server.log" ]; then \
-			tail -n 50 -f "/tmp/frontend-server.log"; \
-		else \
-			echo "Frontend log file not found"; \
-		fi; \
-	else \
-		echo "\033[1;33m[!] Frontend server is not running\033[0m"; \
-	fi
-
 # FORMAT TARGET
-.PHONY: format/backend
-format/backend: ensure-poetry-env ## Format and lint backend Python code using black and ruff
-	@echo "Formatting Python files..."
-	poetry run black $(PYTHON_FILES)
-	@echo "Running Ruff linter..."
-	poetry run ruff check --ignore I001 $(PYTHON_FILES) || true
+.PHONY: format
+format: ensure-poetry-env ## Format and lint Python code
+	@echo "Formatting and linting Python files using format.py..."
+	poetry run format
 	@echo "Formatting and linting completed"
 
 .PHONY: ruff-fix
@@ -402,15 +176,59 @@ _lock: ensure-poetry-env
 	@echo "Updating poetry.lock file..."
 	poetry lock
 
+# BUILD TARGET
+.PHONY: build
+build: ensure-poetry-env clean ## Build the package
+	@echo "\033[1;33m[*] Building '$(APP_NAME)' package\033[0m"
+	poetry build
+	@echo "\033[1;32m[✓] Package built successfully to dist/\033[0m"
+
+# TEST PUBLISH TARGET
+.PHONY: test-publish
+test-publish: ensure-poetry-env token-check build ## Build and publish package to TestPyPI
+	@echo "\033[1;33m[*] Publishing '$(APP_NAME)' to TestPyPI\033[0m"
+	@# Ensure twine is available (it's a dev dependency)
+	@if ! poetry run twine --version >/dev/null 2>&1; then \
+		echo "\033[1;31m[!] Twine is not installed or not found in poetry env. Please install dev dependencies (make install or ensure twine is in dev group).\033[0m"; \
+		exit 1; \
+	fi
+	twine upload --repository testpypi dist/*
+	@echo "\033[1;32m[✓] Published to TestPyPI successfully\033[0m"
+
 # PUBLISH TARGET
 .PHONY: publish
-publish: ensure-poetry-env token-check clean ## Build and publish package to PyPI
-	@echo "\033[1;33m[*] Building and publishing '$(APP_NAME)' to PyPI\033[0m"
+publish: ensure-poetry-env token-check build ## Publish package to PyPI (requires prior build)
+	@echo "\033[1;33m[*] Publishing '$(APP_NAME)' to PyPI\033[0m"
 	@# Verify keyring is installed
 	@if ! poetry run pip show keyring >/dev/null 2>&1; then \
 		echo "\033[1;33m[*] Installing keyring...\033[0m"; \
 		poetry run pip install keyring keyrings.alt; \
 	fi
-	poetry build
 	poetry publish
 	@echo "\033[1;32m[✓] Published to PyPI successfully\033[0m"
+
+# SHOW PACKAGE CONTENTS TARGET
+.PHONY: show-package
+show-package: ensure-poetry-env build ## Show contents of the built package files
+	@echo "\033[1;33m[*] Showing contents of built packages in dist/\033[0m"
+	@if [ -z "$$(ls -A dist/*.tar.gz 2>/dev/null)" ] || [ -z "$$(ls -A dist/*.whl 2>/dev/null)" ]; then \
+		echo "\033[1;31m[!] No built packages found in dist/. Run 'make build' first.\033[0m"; \
+		exit 1; \
+	fi
+	@echo "\n--- Contents of .tar.gz file ---"
+	@for tarball in dist/*.tar.gz; do \
+		if [ -f "$$tarball" ]; then \
+			echo "Contents of $$tarball:"; \
+			tar tzf "$$tarball"; \
+			echo ""; \
+		fi; \
+	done
+	@echo "\n--- Contents of .whl file (archive listing) ---"
+	@for wheel in dist/*.whl; do \
+		if [ -f "$$wheel" ]; then \
+			echo "Contents of $$wheel:"; \
+			unzip -l "$$wheel"; \
+			echo ""; \
+		fi; \
+	done
+	@echo "\033[1;32m[✓] Finished showing package contents\033[0m"

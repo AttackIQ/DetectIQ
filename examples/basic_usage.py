@@ -26,17 +26,20 @@ To use this example:
    - setup-embeddings: Create or update embeddings for all rule types
 """
 
-import sys
-
 import argparse
 import asyncio
 import os
-from dotenv import load_dotenv, find_dotenv
+import sys
 from pathlib import Path
-from typing import cast, Dict, Any, Union, Optional
+from typing import Any, Dict, Optional, Union, cast
+
+from dotenv import find_dotenv, load_dotenv
 
 # Load environment variables before importing detectiq modules
 load_dotenv(find_dotenv())
+
+from langchain.schema.language_model import BaseLanguageModel
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from detectiq.core.llm.sigma_rules import SigmaLLM
 from detectiq.core.llm.snort_rules import SnortLLM
@@ -47,8 +50,6 @@ from detectiq.core.llm.yara_rules import YaraLLM
 from detectiq.core.utils.logging import get_logger
 from detectiq.core.utils.snort.pcap_analyzer import PcapAnalyzer
 from detectiq.core.utils.yara.file_analyzer import FileAnalyzer
-from langchain.schema.language_model import BaseLanguageModel
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 logger = get_logger(__name__)
 

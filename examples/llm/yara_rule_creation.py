@@ -5,9 +5,10 @@
 
 import argparse
 import asyncio
+from typing import cast
+
 from langchain.schema.language_model import BaseLanguageModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from typing import cast
 
 from detectiq.core.llm.toolkits.base import create_rule_agent
 from detectiq.core.llm.toolkits.yara_toolkit import YaraToolkit
