@@ -1,7 +1,7 @@
 import asyncio
 import re
 from datetime import datetime
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 import yara  # Ensure you have yara-python installed
 from langchain.prompts import ChatPromptTemplate
@@ -59,6 +59,7 @@ while avoiding false positives.
         description: str,
         rule_context: Optional[str] = None,
         file_analysis: Optional[Dict[str, Any]] = None,
+        chat_history: Optional[List[Any]] = None,
     ) -> Dict[str, Any]:
         try:
             execution_id = id(description)  # Get unique execution identifier
@@ -75,9 +76,22 @@ while avoiding false positives.
             # Format similar rules context
             context_text = "\n".join(doc.page_content for doc in similar_rules)
 
+            # Format chat history for prompt
+            formatted_chat_history = "N/A"
+            if chat_history:
+                history_lines = []
+                for msg in chat_history:
+                    # Assuming msg objects have 'type' (e.g., 'human', 'ai') and 'content' attributes
+                    role = "User" if msg.type == "human" else "Assistant"
+                    history_lines.append(f"{role}: {msg.content}")
+                formatted_chat_history = "\n".join(history_lines)
+
             template = """You are an expert network security analyst specializing in Snort rule creation.
 
-Given the following description and context, create an effective Snort rule that detects malicious network traffic while minimizing false positives.
+Given the following description, conversation history, and context, create an effective Snort rule that detects malicious network traffic while minimizing false positives.
+
+Conversation History:
+{formatted_chat_history}
 
 Context (Similar Rules):
 {context_text}
@@ -160,6 +174,7 @@ You MUST provide your response in the following format, using standard markdown 
                     "file_analysis": lambda x: file_analysis,
                     "rule_context": lambda x: rule_context or "No additional context provided.",
                     "current_date": lambda x: current_date,
+                    "formatted_chat_history": lambda x: formatted_chat_history,
                 }
                 | prompt
                 | self.llm
