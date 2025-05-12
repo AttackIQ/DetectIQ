@@ -6,7 +6,6 @@ DetectIQ is an AI-powered security rule management platform that helps create, a
 - [Quickstart](#quickstart)
 - [Current Features](#current-features)
 - [Road Map](#road-map)
-- [Screenshots](#screenshots)
 - [Using as a Package](#using-as-a-package)
 - [Environment Configuration](#environment-configuration)
 - [Development](#development)
@@ -88,39 +87,6 @@ poetry install --all-extras
 - [ ] Project refactoring for production readiness
 - [ ] Rule management without OpenAI requirements
 - [ ] More non-webapp examples
-
-## Screenshots
-### Rule Dashboard with Splunk Deployment Option
-<p align="center">
-  <em>Rule Dashboard with Splunk Deployment Option</em>
-  <img src="docs/images/detectiq_rules_page.png" alt="Rule Dashboard with Splunk Deployment Option"/>
-</p>
-
-### Sigma Rule Creation
-<p align="center">
-  <em>Sigma Rule Creation from threat report snippet</em>
-  <img src="docs/images/detectiq_sigma_rule_creation_1.png" alt="Sigma Rule Creation"/>
-  <img src="docs/images/detectiq_sigma_rule_creation_2.png" alt="Sigma Rule Creation"/>
-</p>
-
-### YARA Rule Creation
-<p align="center">
-  <em>YARA Rule Creation using file analysis from uploaded mimikatz.exe sample</em>
-  <img src="docs/images/detectiq_yara_rule_creation_file_1.png" alt="YARA Rule Creation"/>
-  <img src="docs/images/detectiq_yara_rule_creation_file_2.png" alt="YARA Rule Creation"/>
-</p>
-
-### Settings Page
-<p align="center">
-  <em>Settings Page</em>
-  <img src="docs/images/detectiq_settings.png" alt="Settings Page"/>
-</p>
-
-### About Page
-<p align="center">
-  <em>About Page</em>
-  <img src="docs/images/detectiq_about.png" alt="About Page"/>
-</p>
 
 ## Using as a Package
 

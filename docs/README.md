@@ -6,16 +6,11 @@
 * [Configuration](#configuration)
     * [Required Environment Variables](#required-environment-variables)
     * [Optional Environment Variables](#optional-environment-variables)
-* [Starting the Development Servers](#starting-the-development-servers)
-    * [Using VS Code](#using-vscode)
-    * [Using the Terminal](#using-the-terminal)
-* [Maintenance Commands](#maintenance-commands)
 
 ## Getting Started
 ### Prerequisites
 * Python 3.9 or higher
-* Node.js 16+
-* Poetry for dependency management
+* Poetry for dependency management (recommended)
 
 ### Project Structure
 ```
@@ -23,49 +18,52 @@ DetectIQ/
 ├── detectiq/
 │   ├── core/               # Core functionality
 │   ├── licenses/           # License files
-│   ├── llm/                # LLM integration
-│   │   ├── agents/         # LangChain agents
-│   │   └── tools/          # Custom tools
-│   └── webapp/             # Web application
-│       ├── frontend/       # Next.js frontend
-│       └── backend/        # Django backend
+│   └── llm/                # LLM integration
+│       ├── agents/         # LangChain agents
+│       └── tools/          # Custom tools
+├── examples/               # Usage examples
 ├── tests/                  # Test suite
 └── poetry.lock            # Dependency lock file
 ```
 
 ### Installation
-**Step 1.** Clone the repository.
+**Option 1:** Install from PyPI
 ```bash
+pip install detectiq
+```
+
+**Option 2:** Install from source
+```bash
+# Clone the repository
 git clone https://github.com/AttackIQ/DetectIQ.git
+cd DetectIQ
+
+# Install using poetry (recommended)
+poetry install --all-extras
+
+# Or using pip
+# pip install .
 ```
 
 **Step 2.** Set your environment variables (using [`.env.example`](./env.example) as a template).
 ```bash
 cp .env.example .env
+# Edit .env with your API keys and configuration
 ```
 
-**Step 3.** Run the provided `start.sh` script and pass `install` as an argument.
-```bash
-bash start.sh install
-```
-
-The initialization process will:
-1. Set up the database schema
-2. Download official rule repositories
-3. Create necessary directories
-4. Generate embeddings for rule search (if `--create_vectorstores` is used)
-5. Normalize rule metadata
+When using as a library, you'll need to initialize:
+1. Create necessary directories for rules and vector stores
+2. Download official rule repositories (if needed)
+3. Generate embeddings for rule search
 
 > **Note**: Initial vector store creation may take some time depending on the number of rules and your hardware. Use the `--rule_types` flag to initialize specific rulesets if you don't need all of them.
 
 ## Configuration
-Set the required environment variables in the `.env` file. See the `.env.example` file for more information. You can also set the optional environment variables to customize the behavior of the application, or rely on the defaults in `detectiq/globals.py`.  You can also set and update settings in the webapp UI, if using the webapp.
+Set the required environment variables in the `.env` file. See the `.env.example` file for more information. You can also set the optional environment variables to customize the behavior of the library, or rely on the defaults in `detectiq/globals.py`.
 
 ### Required Environment Variables
 ```bash
 OPENAI_API_KEY="your-api-key"
-DEBUG=True
-DJANGO_SECRET_KEY=django-insecure-your-secret-key-here
 ```
 
 ### Optional Environment Variables
@@ -91,33 +89,68 @@ SIGMA_PACKAGE_TYPE="core"                       # Sigma ruleset type (default: c
 YARA_PACKAGE_TYPE="core"                        # YARA ruleset type (default: core)
 ```
 
-## Starting the Development Servers
-> **Note**: You must have both the frontend and backend servers running to use the webapp.
-> 
-> Navigate to http://localhost:3000/ to access the webapp UI after starting the servers.
+## Using the Library
 
-### Using VSCode
-Under Run/Debug, select the "Full Stack" configuration and click the green play button.
+Refer to the examples in the `examples/` directory for detailed usage patterns. Here's a basic example of using DetectIQ to create a YARA rule:
 
-### Using the Terminal
-```bash
-# Start frontend development server
-cd detectiq/webapp/frontend
-npm run dev
+```python
+import asyncio
+from typing import cast
+import os
 
-# Start backend development server
-cd detectiq/
-python manage.py runserver
+# Set OpenAI API key
+os.environ["OPENAI_API_KEY"] = "your-api-key"
+
+from langchain.schema.language_model import BaseLanguageModel
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from detectiq.core.llm.yara_rules import YaraLLM
+from detectiq.core.llm.toolkits.base import create_rule_agent
+from detectiq.core.llm.toolkits.yara_toolkit import YaraToolkit
+
+async def main():
+    # Initialize LLMs
+    agent_llm = cast(BaseLanguageModel, ChatOpenAI(temperature=0, model="gpt-4o"))
+    rule_creation_llm = cast(BaseLanguageModel, ChatOpenAI(temperature=0, model="gpt-4o"))
+    
+    # Initialize YARA tools
+    yara_llm = YaraLLM(
+        embedding_model=OpenAIEmbeddings(model="text-embedding-3-small"),
+        agent_llm=agent_llm,
+        rule_creation_llm=rule_creation_llm,
+        rule_dir="./rules",
+        vector_store_dir="./vectorstore",
+    )
+    
+    # Create agent
+    yara_agent = create_rule_agent(
+        rule_type="yara",
+        vectorstore=yara_llm.vectordb,
+        rule_creation_llm=yara_llm.rule_creation_llm,
+        agent_llm=yara_llm.agent_llm,
+        toolkit_class=YaraToolkit,
+    )
+    
+    # Create a rule
+    result = await yara_agent.ainvoke({"input": "Create a YARA rule to detect ransomware"})
+    print(result.get("output"))
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
-## Maintenance Commands
-```bash
-# Delete all rules (use with caution)
-python manage.py delete_all_rules --dry-run  # Preview what will be deleted
-python manage.py delete_all_rules --rule-type sigma  # Delete specific rule type
-python manage.py delete_all_rules  # Delete all rules
+## Rule Management
+
+To manage your rules, use the provided library methods rather than command-line tools. For example:
+
+```python
+from detectiq.core.rules.sigma_rules import SigmaRuleManager
+
+# Initialize rule manager
+rule_manager = SigmaRuleManager(rule_dir="./rules")
+
+# Delete all rules
+rule_manager.delete_all_rules()
 
 # Delete only LLM-generated rules
-python manage.py delete_llm_rules --dry-run  # Preview
-python manage.py delete_llm_rules  # Execute deletion
+rule_manager.delete_generated_rules()
 ```
