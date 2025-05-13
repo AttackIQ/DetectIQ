@@ -184,46 +184,6 @@ files = [
 ]
 
 [[package]]
-name = "attackiq-sigmaiq"
-version = "0.4.45"
-description = "Wrapper and tools for pySigma and Sigma rules"
-optional = false
-python-versions = "<=3.12,>=3.9"
-files = [
-    {file = "attackiq_sigmaiq-0.4.45-py3-none-any.whl", hash = "sha256:ef81ce277ed035963117cd7a00fdb69cfa27638f318e313454d5a1a0886a5371"},
-    {file = "attackiq_sigmaiq-0.4.45.tar.gz", hash = "sha256:11e11745eb3c502aae8834074a27fbe74d546771536a0bcd9a9bd215e8356bcc"},
-]
-
-[package.dependencies]
-certifi = "*"
-faiss-cpu = "*"
-importlib-resources = "*"
-langchain = "*"
-langchain-community = "*"
-langchain-core = "*"
-langchain-openai = "*"
-openai = "*"
-pysigma = ">=0.11.14,<0.12.0"
-pysigma-backend-carbonblack = ">=0.1.8,<0.2.0"
-pysigma-backend-cortexxdr = ">=0.1.4,<0.2.0"
-pysigma-backend-crowdstrike = ">=2.0.0,<3.0.0"
-pysigma-backend-elasticsearch = ">=1.1.2,<2.0.0"
-pysigma-backend-insightidr = ">=0.2.4,<0.3.0"
-pysigma-backend-kusto = ">=0.4.0,<0.5.0"
-pysigma-backend-loki = ">=0.12.0,<0.13.0"
-pysigma-backend-netwitness = ">=0.1.3,<0.2.0"
-pysigma-backend-opensearch = ">=1.0.2,<2.0.0"
-pysigma-backend-qradar-aql = ">=0.3.2,<0.4.0"
-pysigma-backend-secops = "0.1.4"
-pysigma-backend-sentinelone = ">=0.1.3,<0.2.0"
-pysigma-backend-splunk = ">=1.1.0,<2.0.0"
-pysigma-backend-stix2 = ">=0.2.0,<0.3.0"
-pysigma-pipeline-sysmon = ">=1.0.4,<2.0.0"
-pysigma-pipeline-windows = ">=1.2.0,<2.0.0"
-six = "*"
-tiktoken = "*"
-
-[[package]]
 name = "attrs"
 version = "25.3.0"
 description = "Classes Without Boilerplate"
@@ -1455,21 +1415,21 @@ xai = ["langchain-xai"]
 
 [[package]]
 name = "langchain-community"
-version = "0.3.23"
+version = "0.3.24"
 description = "Community contributed LangChain integrations."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "langchain_community-0.3.23-py3-none-any.whl", hash = "sha256:7b5328e749df6bbaf8e60c53d810a95ab22f2d2262911b206b0fb582d58350b7"},
-    {file = "langchain_community-0.3.23.tar.gz", hash = "sha256:afb4b34d8b75fc00f78b2270e988bb48fff96b333d23fae05ab32d012940973f"},
+    {file = "langchain_community-0.3.24-py3-none-any.whl", hash = "sha256:b6cdb376bf1c2f4d2503aca20f8f35f2d5b3d879c52848277f20ce1950e7afaf"},
+    {file = "langchain_community-0.3.24.tar.gz", hash = "sha256:62d9e8cf9aadf35182ec3925f9ec1c8e5e84fb4f199f67a01aee496d289dc264"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.3,<4.0.0"
 dataclasses-json = ">=0.5.7,<0.7"
 httpx-sse = ">=0.4.0,<1.0.0"
-langchain = ">=0.3.24,<1.0.0"
-langchain-core = ">=0.3.56,<1.0.0"
+langchain = ">=0.3.25,<1.0.0"
+langchain-core = ">=0.3.59,<1.0.0"
 langsmith = ">=0.1.125,<0.4"
 numpy = {version = ">=1.26.2", markers = "python_version < \"3.13\""}
 pydantic-settings = ">=2.4.0,<3.0.0"
@@ -1924,13 +1884,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.78.0"
+version = "1.78.1"
 description = "The official Python library for the openai API"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "openai-1.78.0-py3-none-any.whl", hash = "sha256:1ade6a48cd323ad8a7715e7e1669bb97a17e1a5b8a916644261aaef4bf284778"},
-    {file = "openai-1.78.0.tar.gz", hash = "sha256:254aef4980688468e96cbddb1f348ed01d274d02c64c6c69b0334bf001fb62b3"},
+    {file = "openai-1.78.1-py3-none-any.whl", hash = "sha256:7368bf147ca499804cc408fe68cdb6866a060f38dec961bbc97b04f9d917907e"},
+    {file = "openai-1.78.1.tar.gz", hash = "sha256:8b26b364531b100df1b961d03560042e5f5be11301d7d49a6cd1a2b9af824dca"},
 ]
 
 [package.dependencies]
@@ -3860,4 +3820,4 @@ splunk = ["splunk-sdk"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <=3.12"
-content-hash = "4ae29db6cb7076c7ddb5a079a103b2f76e241dd9aa06a35c13e0994260c5bb2a"
+content-hash = "c3bef69f34b42e81eb0ce87f784ef840deb90273e93e62354d7e549f9322c53d"

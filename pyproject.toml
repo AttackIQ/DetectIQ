@@ -36,7 +36,29 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.9, <=3.12"
-attackiq-sigmaiq = ">=0.4.42"
+six = "*"
+pysigma = "^0.11.14"
+# certifi is usually transitive, can be added if direct import errors occur
+pysigma-backend-carbonblack = "^0.1.8"
+pysigma-backend-cortexxdr = "^0.1.4"
+pysigma-backend-crowdstrike = "^2.0.0"
+pysigma-backend-elasticsearch = "^1.1.2"
+pysigma-backend-insightidr = "^0.2.4" # Add, but ensure code in sigmaiq supports it
+pysigma-backend-kusto = "^0.4.0"
+pysigma-backend-loki = "^0.12.0"
+pysigma-backend-netwitness = "^0.1.3"
+pysigma-backend-opensearch = "^1.0.2"
+pysigma-backend-qradar-aql = "^0.3.2"
+pysigma-backend-sentinelone = "^0.1.3"
+pysigma-backend-splunk = "^1.1.0"
+pysigma-backend-stix2 = "^0.2.0"
+pysigma-backend-secops = "0.1.4"
+pysigma-pipeline-sysmon = "^1.0.4"
+pysigma-pipeline-windows = "^1.2.0"
+importlib-resources = {version = "*", python = "<3.10"} # importlib.resources is stdlib 3.10+
+# For python >=3.10, importlib_resources might not be strictly needed if code uses importlib.resources
+# but adding it with a condition is safer for broader compatibility if older SigmAIQ code used it explicitly.
+
 langchain = "^0.3.7"
 langchain-community = "^0.3.7"
 langchain-openai = "^0.2.8"
