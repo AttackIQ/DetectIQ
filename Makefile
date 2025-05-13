@@ -4,7 +4,13 @@ SHELL := /bin/bash
 .SILENT: install clean format ruff-fix build publish test-publish show-package
 
 APP_NAME ?= "DetectIQ"
-PYTHON_FILES := $(shell git ls-files "*.py")
+PYTHON_FILES := $(shell \
+  (git ls-files && \
+   git ls-files --others --exclude-standard && \
+   git diff --name-only && \
+   git diff --name-only --cached) | \
+   sort | uniq | grep '\.py$$' \
+)
 
 # Default target is help
 .DEFAULT_GOAL := help
