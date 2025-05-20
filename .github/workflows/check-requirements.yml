@@ -15,7 +15,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Update requirements
-        run: python update_requirements.py
+        run: poetry update
       - name: Check for changes
         run: |
           if [[ -n $(git status --porcelain) ]]; then
