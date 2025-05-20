@@ -1,7 +1,8 @@
 from sigma.backends.cortexxdr import CortexXDRBackend
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
-from sigma.rule import SigmaRule
 from sigma.conversion.state import ConversionState
+from sigma.rule import SigmaRule
+
+from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 
 class SigmAIQCortexXDRBackend(AbstractGenericSigmAIQBackendClass, CortexXDRBackend):

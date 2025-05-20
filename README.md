@@ -207,7 +207,6 @@ make install              # Install package with all extras
 
 # Code quality
 make format               # Format Python files
-make ruff-fix             # Run Ruff linter with auto-fixes
 make test                 # Run tests with coverage
 
 # Package management

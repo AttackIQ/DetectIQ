@@ -1,8 +1,8 @@
 from langchain.prompts import (
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
     ChatPromptTemplate,
+    HumanMessagePromptTemplate,
     MessagesPlaceholder,
+    SystemMessagePromptTemplate,
 )
 
 system_template = """

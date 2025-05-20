@@ -1,6 +1,6 @@
 # stdlib
 import os
-from typing import Type, List
+from typing import List, Type
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader

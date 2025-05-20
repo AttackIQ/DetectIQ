@@ -1,13 +1,13 @@
 import asyncio
 import json
-from typing import Optional, Union, Type
+from typing import Optional, Type, Union
 
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Extra, Field
 
 from sigmaiq.sigmaiq_backend_factory import AVAILABLE_BACKENDS
 

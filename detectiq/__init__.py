@@ -1,3 +1,3 @@
 # Root package initialization
 VERSION = "0.1.0"
-__version__ = "0.1.32"
+__version__ = "0.1.33"

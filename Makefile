@@ -1,16 +1,9 @@
 # Set the shell to bash
 SHELL := /bin/bash
 
-.SILENT: install clean format ruff-fix build publish test-publish show-package
+.SILENT: install clean format build publish show-package
 
 APP_NAME ?= "DetectIQ"
-PYTHON_FILES := $(shell \
-  (git ls-files && \
-   git ls-files --others --exclude-standard && \
-   git diff --name-only && \
-   git diff --name-only --cached) | \
-   sort | uniq | grep '\.py$$' \
-)
 
 # Default target is help
 .DEFAULT_GOAL := help
@@ -92,18 +85,10 @@ install: ensure-poetry-env ## Install backend dependencies and extras
 .PHONY: format
 format: ensure-poetry-env ## Format Python code with Black
 	@echo "Formatting Python files with Black..."
-	poetry run black . # Use current directory for black, similar to original broader scope
+	poetry run ruff check . --fix
+	poetry run isort --profile black .
+	poetry run black .
 	@echo "Formatting completed"
-
-.PHONY: ruff
-ruff: ensure-poetry-env ## Run Ruff linter
-	@echo "Running Ruff linter..."
-	poetry run ruff check --ignore E501,F401 $(PYTHON_FILES)
-
-.PHONY: ruff-fix
-ruff-fix: ensure-poetry-env ## Run Ruff linter with auto-fixes
-	@echo "Running Ruff linter with auto-fixes..."
-	poetry run ruff check --fix --ignore E501,F401 $(PYTHON_FILES) # Aligned ignored rules with SigmaIQ
 
 # TEST TARGET
 .PHONY: test
@@ -194,18 +179,6 @@ build: ensure-poetry-env clean ## Build the package
 	poetry build
 	@echo -e "\033[1;32m[✓] Package built successfully to dist/\033[0m"
 
-# TEST PUBLISH TARGET
-.PHONY: test-publish
-test-publish: ensure-poetry-env token-check build ## Build and publish package to TestPyPI
-	@echo -e "\033[1;33m[*] Publishing '$(APP_NAME)' to TestPyPI\033[0m"
-	@# Ensure twine is available (it's a dev dependency)
-	@if ! poetry run twine --version >/dev/null 2>&1; then \
-		echo -e "\033[1;31m[!] Twine is not installed or not found in poetry env. Please install dev dependencies (make install or ensure twine is in dev group).\033[0m"; \
-		exit 1; \
-	fi
-	twine upload --repository testpypi dist/*
-	@echo -e "\033[1;32m[✓] Published to TestPyPI successfully\033[0m"
-
 # PUBLISH TARGET
 .PHONY: publish
 publish: ensure-poetry-env token-check build ## Publish package to PyPI (requires prior build)
@@ -219,8 +192,8 @@ publish: ensure-poetry-env token-check build ## Publish package to PyPI (require
 	@echo -e "\033[1;32m[✓] Published to PyPI successfully\033[0m"
 
 # SHOW PACKAGE CONTENTS TARGET
-.PHONY: show-package
-show-package: ensure-poetry-env build ## Show contents of the built package files
+.PHONY: show-package-contents
+show-package-contents: ensure-poetry-env build ## Show contents of the built package files
 	@echo -e "\033[1;33m[*] Showing contents of built packages in dist/\033[0m"
 	@if [ -z "$$(ls -A dist/*.tar.gz 2>/dev/null)" ] || [ -z "$$(ls -A dist/*.whl 2>/dev/null)" ]; then \
 		echo -e "\033[1;31m[!] No built packages found in dist/. Run 'make build' first.\033[0m"; \

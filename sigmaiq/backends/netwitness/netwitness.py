@@ -1,4 +1,5 @@
 from sigma.backends.netwitness import NetWitnessBackend
+
 from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 

@@ -1,7 +1,7 @@
 # stdlib
 import json
 from json import JSONDecodeError
-from typing import Optional, Dict, Any, Union
+from typing import Any, Dict, Optional, Union
 
 # langchain
 from langchain.agents.agent import AgentExecutor

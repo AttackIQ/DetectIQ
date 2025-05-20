@@ -5,7 +5,7 @@ from copy import copy
 
 # %% Import pprint for pretty printing, and copy for copying rules
 from pprint import pprint
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 # %% Import SigmAIQ
 from sigmaiq import SigmAIQBackend, SigmAIQPipeline

@@ -1,10 +1,12 @@
-from sigma.backends.splunk import SplunkBackend
-from sigma.rule import SigmaRule
-from sigma.collection import SigmaCollection
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
-from copy import copy, deepcopy
 import re
+from copy import copy, deepcopy
+
 from importlib_resources import files
+from sigma.backends.splunk import SplunkBackend
+from sigma.collection import SigmaCollection
+from sigma.rule import SigmaRule
+
+from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 SAVEDSEARCHES_TEMPLATE = files("sigmaiq.backends.splunk").joinpath("savedsearches_template.txt").read_text()
 

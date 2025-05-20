@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "detectiq"
-version = "0.1.32"
+version = "0.1.33"
 description = "A detection engineering workbench with LLM capabilities, including SigmaIQ features"
 authors = ["AttackIQ <rajesh.sharma@attackiq.com>"]
 readme = "README.md"
@@ -181,5 +181,3 @@ addopts = "--cov=detectiq --cov-report=term-missing"
 asyncio_mode = "auto"
 
 [tool.poetry.scripts]
-update-reqs = "update_requirements:main"
-format = "format:main"

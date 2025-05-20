@@ -7,16 +7,14 @@ This document provides instructions for publishing the DetectIQ package to PyPI 
 Before publishing to PyPI, ensure you have the following:
 
 1. A PyPI account (create one at [pypi.org](https://pypi.org/account/register/))
-2. The necessary tools:
+2. The necessary tools (installed via Makefile or dev dependencies):
    ```bash
-   pip install --upgrade pip setuptools wheel twine build keyring keyrings.alt
+   # Ensure dev dependencies are installed, which include build, twine, keyring
+   make install 
    ```
-   Alternatively, use the development dependencies:
-   ```bash
-   make install # Installs dev dependencies including twine, build, keyring if grouped in pyproject.toml
-   ```
+   Poetry, `build`, `twine`, and `keyring` (with `keyrings.alt`) are the key tools, typically managed as dev dependencies in `pyproject.toml` and installed via `poetry install --with dev` or a `make install` target that includes dev dependencies.
    
-3. A PyPI token configured for authentication:
+3. A PyPI token configured for authentication (the Makefile helps with this):
    ```bash
    make token-set TOKEN=your-pypi-token
    ```
@@ -25,9 +23,9 @@ Before publishing to PyPI, ensure you have the following:
 
 ## Publishing Steps
 
-### Option 1: Using the Makefile (Recommended)
+### Using the Makefile (Recommended)
 
-1. Configure your PyPI token (one-time setup):
+1. Configure your PyPI token (one-time setup, if not done already):
    ```bash
    make token-set TOKEN=your-pypi-token
    ```

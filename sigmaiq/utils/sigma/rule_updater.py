@@ -1,11 +1,12 @@
+import io
 import os
 import shutil
+import zipfile
+from pathlib import Path
 
 import requests
+
 from sigmaiq.globals import DEFAULT_DIRS
-from pathlib import Path
-import zipfile
-import io
 
 
 class SigmaRuleUpdater:

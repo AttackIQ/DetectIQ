@@ -1,4 +1,5 @@
 from sigma.backends.opensearch import OpensearchLuceneBackend
+
 from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 

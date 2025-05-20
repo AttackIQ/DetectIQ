@@ -1,5 +1,5 @@
 import asyncio
-from typing import Union, Type
+from typing import Type, Union
 
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.language_model import BaseLanguageModel
@@ -7,7 +7,7 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.vectorstore import VectorStore
 from langchain.tools import BaseTool
-from pydantic import BaseModel, Field, Extra
+from pydantic import BaseModel, Extra, Field
 
 
 class FindSigmaRuleInput(BaseModel):

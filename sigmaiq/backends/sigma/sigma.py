@@ -1,11 +1,12 @@
+import json
 from typing import List, Union
 
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
-from sigma.rule import SigmaRule
-from sigma.collection import SigmaCollection
-import json
 import yaml
+from sigma.collection import SigmaCollection
 from sigma.conversion.base import TextQueryBackend
+from sigma.rule import SigmaRule
+
+from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 
 class SigmAIQSigmaBackend(AbstractGenericSigmAIQBackendClass, TextQueryBackend):

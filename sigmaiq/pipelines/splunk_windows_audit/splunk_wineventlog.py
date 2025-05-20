@@ -1,7 +1,7 @@
 from sigma.pipelines.splunk import splunk_windows_pipeline
 from sigma.pipelines.windows import windows_audit_pipeline
-from sigma.processing.resolver import ProcessingPipelineResolver
 from sigma.processing.pipeline import ProcessingPipeline
+from sigma.processing.resolver import ProcessingPipelineResolver
 
 
 def splunk_wineventlog_pipeline() -> ProcessingPipeline:

@@ -1,4 +1,5 @@
 from sigma.backends.stix import stixBackend
+
 from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
 
 

@@ -1,1 +1,5 @@
-from .kusto import SigmAIQDefenderXDRBackend, SigmAIQSentinelASIMBackend, SigmAIQAzureMonitorBackend
+from .kusto import (
+    SigmAIQAzureMonitorBackend,
+    SigmAIQDefenderXDRBackend,
+    SigmAIQSentinelASIMBackend,
+)

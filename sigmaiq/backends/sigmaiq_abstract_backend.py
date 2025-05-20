@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Union, Dict, List
+from typing import Dict, List, Union
 
 from sigma.collection import SigmaCollection
 from sigma.conversion.base import TextQueryBackend

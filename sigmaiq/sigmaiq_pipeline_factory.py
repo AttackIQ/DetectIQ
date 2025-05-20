@@ -1,37 +1,51 @@
-from typing import Dict, Optional, Union, Callable, List
+from typing import Callable, Dict, List, Optional, Union
 from uuid import uuid4
 
-## QRadar
-from sigma.pipelines.QRadarAQL import QRadarAQL_fields_pipeline, QRadarAQL_payload_pipeline
 from sigma.pipelines.azuremonitor import azure_monitor_pipeline
 
 ## Carbon Black
-from sigma.pipelines.carbonblack import CarbonBlack_pipeline, CarbonBlackResponse_pipeline
+from sigma.pipelines.carbonblack import (
+    CarbonBlack_pipeline,
+    CarbonBlackResponse_pipeline,
+)
 
 ## Cortex XDR
 from sigma.pipelines.cortexxdr import CortexXDR_pipeline
 
 ## Crowdstrike
-from sigma.pipelines.crowdstrike import crowdstrike_fdr_pipeline, crowdstrike_falcon_pipeline
+from sigma.pipelines.crowdstrike import (
+    crowdstrike_falcon_pipeline,
+    crowdstrike_fdr_pipeline,
+)
 
 ## Elasticsearch
 from sigma.pipelines.elasticsearch import (
+    ecs_kubernetes,
     ecs_windows,
     ecs_windows_old,
     ecs_zeek_beats,
     ecs_zeek_corelight,
-    ecs_kubernetes,
     zeek_raw,
 )
 
 ## Loki
-from sigma.pipelines.loki import loki_grafana_logfmt, loki_promtail_sysmon, loki_okta_system_log
+from sigma.pipelines.loki import (
+    loki_grafana_logfmt,
+    loki_okta_system_log,
+    loki_promtail_sysmon,
+)
 
 ## Microsoft
 from sigma.pipelines.microsoftxdr import microsoft_xdr_pipeline
 
 # Netwitness
 from sigma.pipelines.netwitness import netwitness_windows_pipeline
+
+## QRadar
+from sigma.pipelines.QRadarAQL import (
+    QRadarAQL_fields_pipeline,
+    QRadarAQL_payload_pipeline,
+)
 
 ## SecOps
 from sigma.pipelines.secops import secops_udm_pipeline
@@ -55,7 +69,7 @@ from sigma.pipelines.sysmon import sysmon_pipeline
 
 ## Windows
 from sigma.pipelines.windows import windows_audit_pipeline, windows_logsource_pipeline
-from sigma.processing.pipeline import ProcessingPipeline, ProcessingItem
+from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 from sigma.processing.resolver import ProcessingPipelineResolver
 from sigma.processing.transformations import FieldMappingTransformation
 

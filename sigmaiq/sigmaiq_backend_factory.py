@@ -15,7 +15,11 @@ from sigmaiq.backends.crowdstrike import (
 )
 from sigmaiq.backends.elasticsearch import SigmAIQElasticsearchBackend
 from sigmaiq.backends.insightidr import SigmAIQInsightIDRBackend
-from sigmaiq.backends.kusto import SigmAIQAzureMonitorBackend, SigmAIQDefenderXDRBackend, SigmAIQSentinelASIMBackend
+from sigmaiq.backends.kusto import (
+    SigmAIQAzureMonitorBackend,
+    SigmAIQDefenderXDRBackend,
+    SigmAIQSentinelASIMBackend,
+)
 from sigmaiq.backends.loki import SigmAIQLokiBackend
 from sigmaiq.backends.netwitness import SigmAIQNetwitnessBackend
 from sigmaiq.backends.opensearch import SigmAIQOpensearchBackend
