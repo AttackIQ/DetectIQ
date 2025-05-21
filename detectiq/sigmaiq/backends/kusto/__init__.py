@@ -3,3 +3,5 @@ from .kusto import (
     SigmAIQDefenderXDRBackend,
     SigmAIQSentinelASIMBackend,
 )
+
+__all__ = ["SigmAIQAzureMonitorBackend", "SigmAIQDefenderXDRBackend", "SigmAIQSentinelASIMBackend"]

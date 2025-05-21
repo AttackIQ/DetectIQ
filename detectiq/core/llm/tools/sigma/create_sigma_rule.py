@@ -9,7 +9,6 @@ from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.vectorstore import VectorStore
-from langchain.tools import BaseTool
 from langchain_core.callbacks import BaseCallbackManager, Callbacks
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -241,7 +240,7 @@ You MUST provide your response in the following format, using standard markdown 
                 if in_yaml:
                     # Stop if we hit explanatory text or empty lines after YAML
                     if (stripped_line and ":" not in stripped_line and not stripped_line.startswith("-")) or (
-                        not stripped_line and len(yaml_lines) > 0 and not any(l.strip() for l in yaml_lines[-3:])
+                        not stripped_line and len(yaml_lines) > 0 and not any(line.strip() for line in yaml_lines[-3:])
                     ):
                         break
                     yaml_lines.append(line)

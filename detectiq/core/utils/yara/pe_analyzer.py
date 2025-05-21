@@ -14,7 +14,6 @@ PEFILE_AVAILABLE = importlib.util.find_spec("pefile") is not None
 if PEFILE_AVAILABLE:
     try:
         import pefile
-        from pefile import PE
     except ImportError:
         PEFILE_AVAILABLE = False
         logger.warning("pefile module found but failed to import")
@@ -218,8 +217,7 @@ def decode_rich_products(entries: List[Dict[str, Any]]) -> List[str]:
         0x0003: "Cvtomf510",
         0x0004: "Export0",
         0x0005: "Implib0",
-        0x0006: "Unknown",
-        # Add more product IDs as needed
+        0x0006: "Unknown",  # Add more product IDs as needed
     }
 
     products = []
