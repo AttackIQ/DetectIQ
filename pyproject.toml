@@ -1,12 +1,11 @@
 [tool.poetry]
 name = "detectiq"
-version = "0.1.35"
+version = "0.1.36"
 description = "A detection engineering workbench with LLM capabilities, including SigmaIQ features"
 authors = ["AttackIQ <rajesh.sharma@attackiq.com>"]
 readme = "README.md"
 packages = [
-    { include = "detectiq" },
-    { include = "sigmaiq" }
+    { include = "detectiq" }
 ]
 license = "LGPL-2.1"
 repository = "https://github.com/AttackIQ/DetectIQ"

@@ -17,10 +17,8 @@
 DetectIQ/
 ├── detectiq/
 │   ├── core/               # Core functionality
-│   ├── licenses/           # License files
-│   └── llm/                # LLM integration
-│       ├── agents/         # LangChain agents
-│       └── tools/          # Custom tools
+│   ├── sigmaiq/            # Sigma specific features
+│   │   └── llm/            # LLM integration for Sigma
 ├── examples/               # Usage examples
 ├── tests/                  # Test suite
 └── poetry.lock            # Dependency lock file

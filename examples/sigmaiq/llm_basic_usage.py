@@ -15,7 +15,7 @@
 from langchain_openai import OpenAIEmbeddings
 
 # %% Import SigmAIQ LLM and OpenAIEmbeddings
-from sigmaiq.llm.base import SigmaLLM
+from detectiq.sigmaiq.llm.base import SigmaLLM
 
 sigma_llm = SigmaLLM(embedding_model=OpenAIEmbeddings(model="text-embedding-3-large"))
 

@@ -4,10 +4,10 @@ import asyncio
 
 from langchain_openai import OpenAIEmbeddings
 
-from sigmaiq.llm.base import SigmaLLM
+from detectiq.sigmaiq.llm.base import SigmaLLM
 
 # %% Import required SigmAIQ classes and functions
-from sigmaiq.llm.toolkits.base import create_sigma_agent
+from detectiq.sigmaiq.llm.toolkits.base import create_sigma_agent
 
 # %% Ensure we have our Sigma vector store setup with our base LLM class
 sigma_llm = SigmaLLM(embedding_model=OpenAIEmbeddings(model="text-embedding-3-large"))

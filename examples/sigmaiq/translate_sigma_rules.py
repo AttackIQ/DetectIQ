@@ -8,7 +8,7 @@ from copy import copy
 from pprint import pprint
 
 # %% Import SigmAIQ
-from sigmaiq import SigmAIQBackend
+from detectiq.sigmaiq import SigmAIQBackend
 
 # %% A basic Sigma Rule in YAML str to convert to a query.
 # %% SigmAIQ also accepts a rule in JSON/Dict format, SigmaRule objects, and SigmaCollection objects

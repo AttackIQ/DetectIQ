@@ -213,4 +213,4 @@ licenses/*/*.md
 licenses/*/*.txt
 
 # Custom data folder for vectordb and sigma rules
-sigmaiq/llm/data/*
+detectiq/sigmaiq/llm/data/*
