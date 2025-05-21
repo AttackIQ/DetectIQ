@@ -1,4 +1,3 @@
-import binascii
 import hashlib
 import importlib.util
 import math
@@ -7,8 +6,6 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, List, Optional, Union
-
-from scapy.all import rdpcap
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.core.utils.snort.pcap_analyzer import PcapAnalyzer

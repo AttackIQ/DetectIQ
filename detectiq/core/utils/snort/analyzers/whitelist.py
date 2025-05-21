@@ -1,9 +1,6 @@
 import ipaddress
 import re
-from typing import Any, Dict, List, Set
-
-from scapy.layers.http import HTTPRequest
-from scapy.layers.inet import IP, TCP, UDP
+from typing import Any, Dict
 
 from .base import BaseAnalyzer
 

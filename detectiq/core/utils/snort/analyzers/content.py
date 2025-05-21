@@ -1,5 +1,4 @@
 import binascii
-import math
 import re
 from collections import Counter
 from typing import Any, Dict, List, Sequence

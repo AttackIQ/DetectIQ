@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
 
-from scapy.layers.inet import TCP
-
 
 class BaseAnalyzer(ABC):
     """Base class for PCAP analysis components."""

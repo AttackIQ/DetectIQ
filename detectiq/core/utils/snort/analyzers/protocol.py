@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 from scapy.layers.dns import DNS
 from scapy.layers.http import HTTPRequest, HTTPResponse
@@ -182,7 +182,7 @@ class ProtocolAnalyzer(BaseAnalyzer):
                 flags = self._decode_tcp_flags(tcp.flags)
                 tcp_stats["flag_combinations"][tuple(sorted(flags))] += 1
 
-                if "S" in flags and not "A" in flags:
+                if "S" in flags and "A" not in flags:
                     tcp_stats["handshakes"] += 1
                 if "R" in flags:
                     tcp_stats["resets"] += 1
@@ -317,7 +317,7 @@ class ProtocolAnalyzer(BaseAnalyzer):
         if flags & 0x04:  # RST
             flags_set.add("R")
 
-        if "S" in flags_set and not "A" in flags_set:
+        if "S" in flags_set and "A" not in flags_set:
             return "SYN"
         elif "S" in flags_set and "A" in flags_set:
             return "SYN-ACK"

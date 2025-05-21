@@ -1,7 +1,7 @@
 import asyncio
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type
 
 import yaml
 from langchain.prompts import ChatPromptTemplate
@@ -240,7 +240,7 @@ You MUST provide your response in the following format, using standard markdown 
                     in_yaml = True
                 if in_yaml:
                     # Stop if we hit explanatory text or empty lines after YAML
-                    if (stripped_line and not ":" in stripped_line and not stripped_line.startswith("-")) or (
+                    if (stripped_line and ":" not in stripped_line and not stripped_line.startswith("-")) or (
                         not stripped_line and len(yaml_lines) > 0 and not any(l.strip() for l in yaml_lines[-3:])
                     ):
                         break

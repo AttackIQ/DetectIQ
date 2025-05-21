@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 import keyring
 from dotenv import find_dotenv, load_dotenv
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field
 
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS
@@ -76,7 +76,7 @@ class ConfigManager:
     def _get_default_config(self) -> dict:
         try:
             openai_api_key = keyring.get_password(self.APP_NAME, "openai_api_key")
-        except Exception as err:
+        except Exception:
             openai_api_key = os.getenv("OPENAI_API_KEY", "")
 
         return {

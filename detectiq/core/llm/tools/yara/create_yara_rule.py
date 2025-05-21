@@ -10,7 +10,6 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema import AIMessage, BaseMessage, HumanMessage
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.vectorstore import VectorStore
 from langchain.tools import BaseTool
 from pydantic import BaseModel, ConfigDict

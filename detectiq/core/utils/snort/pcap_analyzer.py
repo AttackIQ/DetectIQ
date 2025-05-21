@@ -2,11 +2,9 @@ import re
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 from scapy.all import rdpcap
-from scapy.layers.http import HTTPRequest, HTTPResponse
-from scapy.layers.inet import IP, TCP, UDP
 from scapy.packet import Packet
 
 from ..logging import get_logger

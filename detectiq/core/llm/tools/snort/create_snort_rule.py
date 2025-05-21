@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Type
 
-import yara  # Ensure you have yara-python installed
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.output_parser import StrOutputParser

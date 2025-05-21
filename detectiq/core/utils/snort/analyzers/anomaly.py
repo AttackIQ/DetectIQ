@@ -1,4 +1,3 @@
-import re
 from typing import Any, Dict, List, Optional, Sequence
 
 from scapy.layers.http import HTTPRequest

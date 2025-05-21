@@ -2,7 +2,6 @@ import asyncio
 import re
 import shutil
 import tarfile
-from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 

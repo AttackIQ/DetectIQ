@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from scapy.layers.http import HTTPRequest, HTTPResponse
 from scapy.packet import Packet
