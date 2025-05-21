@@ -7,44 +7,12 @@ import keyring
 from dotenv import find_dotenv, load_dotenv
 from pydantic import BaseModel, Field, SecretStr
 
-from detectiq.core.integrations.elastic import ElasticCredentials
-from detectiq.core.integrations.microsoft_xdr import MicrosoftXDRCredentials
-from detectiq.core.integrations.splunk import SplunkCredentials
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS
 
 logger = get_logger(__name__)
 
 load_dotenv(find_dotenv())
-
-
-class IntegrationCredentials(BaseModel):
-    """Base integration credentials model."""
-
-    hostname: str = Field(default="")
-    username: Optional[str] = None
-    password: Optional[str] = None
-    api_key: Optional[str] = None
-    client_id: Optional[str] = None
-    client_secret: Optional[str] = None
-    tenant_id: Optional[str] = None
-    cloud_id: Optional[str] = None
-    verify_ssl: bool = True
-    enabled: bool = False
-
-    class Config:
-        extra = "allow"
-
-
-class Integrations(BaseModel):
-    """Integration configuration model."""
-
-    splunk: Optional[SplunkCredentials] = None
-    elastic: Optional[ElasticCredentials] = None
-    microsoft_xdr: Optional[MicrosoftXDRCredentials] = None
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class DetectIQConfig(BaseModel):
@@ -72,7 +40,6 @@ class DetectIQConfig(BaseModel):
     )
     log_level: str = Field(default="INFO")
     model: str = Field(default="gpt-4o")
-    integrations: Integrations = Field(default_factory=Integrations)
     yara_package_type: str = Field(default="core")
 
     @property
@@ -129,7 +96,6 @@ class ConfigManager:
                 "snort": os.getenv("SNORT_VECTOR_STORE_DIR", str(DEFAULT_DIRS.SNORT_VECTOR_STORE_DIR)),
             },
             "log_level": os.getenv("DETECTIQ_LOG_LEVEL", "INFO"),
-            "integrations": {},
             "sigma_package_type": os.getenv("SIGMA_PACKAGE_TYPE", "core"),
             "yara_package_type": os.getenv("YARA_PACKAGE_TYPE", "core"),
         }
