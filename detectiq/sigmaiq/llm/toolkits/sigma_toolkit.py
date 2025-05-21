@@ -10,10 +10,10 @@ from langchain.schema.vectorstore import VectorStore
 from langchain.tools import BaseTool
 
 # sigmaiq tools
-from sigmaiq.llm.tools.create_sigma_rule import CreateSigmaRuleVectorStoreTool
-from sigmaiq.llm.tools.find_sigma_rule import FindSigmaRuleTool
-from sigmaiq.llm.tools.query_to_sigma_rule import QueryToSigmaRuleTool
-from sigmaiq.llm.tools.translate_sigma_rule import TranslateSigmaRuleTool
+from detectiq.sigmaiq.llm.tools.create_sigma_rule import CreateSigmaRuleVectorStoreTool
+from detectiq.sigmaiq.llm.tools.find_sigma_rule import FindSigmaRuleTool
+from detectiq.sigmaiq.llm.tools.query_to_sigma_rule import QueryToSigmaRuleTool
+from detectiq.sigmaiq.llm.tools.translate_sigma_rule import TranslateSigmaRuleTool
 
 
 class SigmaToolkit(BaseToolkit):

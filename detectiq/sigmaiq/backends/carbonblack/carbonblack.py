@@ -3,7 +3,10 @@ from typing import Any
 from sigma.backends.carbonblack import CarbonBlackBackend
 from sigma.conversion.state import ConversionState
 from sigma.rule import SigmaRule
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQCarbonBlackBackend(AbstractGenericSigmAIQBackendClass, CarbonBlackBackend):

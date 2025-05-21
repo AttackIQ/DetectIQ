@@ -4,8 +4,9 @@ from typing import Type, Union
 
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Extra, Field
-from sigmaiq.sigmaiq_backend_factory import AVAILABLE_BACKENDS, SigmAIQBackend
-from sigmaiq.sigmaiq_pipeline_factory import AVAILABLE_PIPELINES
+
+from detectiq.sigmaiq.sigmaiq_backend_factory import AVAILABLE_BACKENDS, SigmAIQBackend
+from detectiq.sigmaiq.sigmaiq_pipeline_factory import AVAILABLE_PIPELINES
 
 
 class TranslateSigmaRuleInput(BaseModel):

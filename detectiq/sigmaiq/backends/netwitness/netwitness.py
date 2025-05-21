@@ -1,5 +1,8 @@
 from sigma.backends.netwitness import NetWitnessBackend
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQNetwitnessBackend(AbstractGenericSigmAIQBackendClass, NetWitnessBackend):

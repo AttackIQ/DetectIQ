@@ -1,5 +1,8 @@
 from sigma.backends.elasticsearch import LuceneBackend
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQElasticsearchBackend(AbstractGenericSigmAIQBackendClass, LuceneBackend):

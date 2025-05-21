@@ -1,7 +1,10 @@
 from sigma.backends.sentinelone import SentinelOneBackend
 from sigma.conversion.state import ConversionState
 from sigma.rule import SigmaRule
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQSentinelOneBackend(AbstractGenericSigmAIQBackendClass, SentinelOneBackend):

@@ -7,36 +7,41 @@ from sigma.processing.pipeline import ProcessingPipeline
 from sigma.rule import SigmaRule
 
 # Backends
-from sigmaiq.backends.carbonblack import SigmAIQCarbonBlackBackend
-from sigmaiq.backends.cortexxdr import SigmAIQCortexXDRBackend
-from sigmaiq.backends.crowdstrike import (
+from detectiq.sigmaiq.backends.carbonblack import SigmAIQCarbonBlackBackend
+from detectiq.sigmaiq.backends.cortexxdr import SigmAIQCortexXDRBackend
+from detectiq.sigmaiq.backends.crowdstrike import (
     SigmAIQCrowdstrikeLogscaleBackend,
     SigmAIQCrowdstrikeSplunkBackend,
 )
-from sigmaiq.backends.elasticsearch import SigmAIQElasticsearchBackend
-from sigmaiq.backends.insightidr import SigmAIQInsightIDRBackend
-from sigmaiq.backends.kusto import (
+from detectiq.sigmaiq.backends.elasticsearch import SigmAIQElasticsearchBackend
+from detectiq.sigmaiq.backends.insightidr import SigmAIQInsightIDRBackend
+from detectiq.sigmaiq.backends.kusto import (
     SigmAIQAzureMonitorBackend,
     SigmAIQDefenderXDRBackend,
     SigmAIQSentinelASIMBackend,
 )
-from sigmaiq.backends.loki import SigmAIQLokiBackend
-from sigmaiq.backends.netwitness import SigmAIQNetwitnessBackend
-from sigmaiq.backends.opensearch import SigmAIQOpensearchBackend
-from sigmaiq.backends.qradar import SigmAIQQRadarBackend
-from sigmaiq.backends.secops import SigmAIQSecOpsBackend
-from sigmaiq.backends.sentinelone import SigmAIQSentinelOneBackend
-from sigmaiq.backends.sigma import SigmAIQSigmaBackend
+from detectiq.sigmaiq.backends.loki import SigmAIQLokiBackend
+from detectiq.sigmaiq.backends.netwitness import SigmAIQNetwitnessBackend
+from detectiq.sigmaiq.backends.opensearch import SigmAIQOpensearchBackend
+from detectiq.sigmaiq.backends.qradar import SigmAIQQRadarBackend
+from detectiq.sigmaiq.backends.secops import SigmAIQSecOpsBackend
+from detectiq.sigmaiq.backends.sentinelone import SigmAIQSentinelOneBackend
+from detectiq.sigmaiq.backends.sigma import SigmAIQSigmaBackend
 
 ## Abstract
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
-from sigmaiq.backends.splunk import SigmAIQSplunkBackend
-from sigmaiq.backends.stix import SigmAIQStixBackend
-from sigmaiq.exceptions import InvalidSigmAIQBackend
-from sigmaiq.sigmaiq_pipeline_factory import SigmAIQPipeline, SigmAIQPipelineResolver
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
+from detectiq.sigmaiq.backends.splunk import SigmAIQSplunkBackend
+from detectiq.sigmaiq.backends.stix import SigmAIQStixBackend
+from detectiq.sigmaiq.exceptions import InvalidSigmAIQBackend
+from detectiq.sigmaiq.sigmaiq_pipeline_factory import (
+    SigmAIQPipeline,
+    SigmAIQPipelineResolver,
+)
 
 # Utils
-from sigmaiq.utils.sigmaiq.sigmaiq_utils import create_sigma_rule_obj
+from detectiq.sigmaiq.utils.sigmaiq.sigmaiq_utils import create_sigma_rule_obj
 
 AVAILABLE_BACKENDS = {
     "carbonblack": "Carbon Black EDR",

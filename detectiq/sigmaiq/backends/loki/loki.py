@@ -1,5 +1,8 @@
 from sigma.backends.loki import LogQLBackend
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQLokiBackend(AbstractGenericSigmAIQBackendClass, LogQLBackend):

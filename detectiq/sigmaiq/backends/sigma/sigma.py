@@ -5,7 +5,10 @@ import yaml
 from sigma.collection import SigmaCollection
 from sigma.conversion.base import TextQueryBackend
 from sigma.rule import SigmaRule
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQSigmaBackend(AbstractGenericSigmAIQBackendClass, TextQueryBackend):
@@ -14,6 +17,7 @@ class SigmAIQSigmaBackend(AbstractGenericSigmAIQBackendClass, TextQueryBackend):
     associated_pipelines = ["sigma_default"]
     default_pipeline = "sigma_default"
     custom_formats = {"yaml": "Default Sigma Rule output format", "json": "JSON style Sigma Rule Output"}
+
     # Override pySigma convert and convert_rule, since we are just outputting it as-is
     # in yaml or json format
 

@@ -1,5 +1,8 @@
 from sigma.backends.kusto import KustoBackend
-from sigmaiq.backends.sigmaiq_abstract_backend import AbstractGenericSigmAIQBackendClass
+
+from detectiq.sigmaiq.backends.sigmaiq_abstract_backend import (
+    AbstractGenericSigmAIQBackendClass,
+)
 
 
 class SigmAIQDefenderXDRBackend(AbstractGenericSigmAIQBackendClass, KustoBackend):

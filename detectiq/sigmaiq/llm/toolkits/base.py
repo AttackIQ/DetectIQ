@@ -24,10 +24,11 @@ from langchain.schema.messages import (
 from langchain.schema.vectorstore import VectorStore
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI
-from sigmaiq.llm.toolkits.prompts import SIGMA_AGENT_PROMPT
+
+from detectiq.sigmaiq.llm.toolkits.prompts import SIGMA_AGENT_PROMPT
 
 # sigmaiq
-from sigmaiq.llm.toolkits.sigma_toolkit import SigmaToolkit
+from detectiq.sigmaiq.llm.toolkits.sigma_toolkit import SigmaToolkit
 
 
 def create_sigma_agent(

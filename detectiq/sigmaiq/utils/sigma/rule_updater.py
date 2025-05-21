@@ -5,7 +5,8 @@ import zipfile
 from pathlib import Path
 
 import requests
-from sigmaiq.globals import DEFAULT_DIRS
+
+from detectiq.sigmaiq.globals import DEFAULT_DIRS
 
 
 class SigmaRuleUpdater:

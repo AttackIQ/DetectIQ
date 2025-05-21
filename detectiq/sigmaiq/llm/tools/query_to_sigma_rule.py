@@ -8,7 +8,8 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Extra, Field
-from sigmaiq.sigmaiq_backend_factory import AVAILABLE_BACKENDS
+
+from detectiq.sigmaiq.sigmaiq_backend_factory import AVAILABLE_BACKENDS
 
 
 class QueryToSigmaRuleInput(BaseModel):

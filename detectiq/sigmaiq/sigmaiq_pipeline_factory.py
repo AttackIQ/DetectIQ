@@ -72,10 +72,14 @@ from sigma.pipelines.windows import windows_audit_pipeline, windows_logsource_pi
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 from sigma.processing.resolver import ProcessingPipelineResolver
 from sigma.processing.transformations import FieldMappingTransformation
-from sigmaiq.exceptions import InvalidCustomFieldMapping, InvalidSigmAIQPipeline
+
+from detectiq.sigmaiq.exceptions import (
+    InvalidCustomFieldMapping,
+    InvalidSigmAIQPipeline,
+)
 
 ## AIQ
-from sigmaiq.pipelines.splunk_windows_audit import splunk_wineventlog_pipeline
+from detectiq.sigmaiq.pipelines.splunk_windows_audit import splunk_wineventlog_pipeline
 
 #############
 # PIPELINES #
@@ -115,8 +119,7 @@ AVAILABLE_PIPELINES = {  # AIQ Custom
         "description": "Crowdstrike Falcon Logscale Mappings",
         "pipeline": crowdstrike_falcon_pipeline(),
         "display_name": "CrowdStrike Falcon Logscale",
-    },
-    # Elasticsearch
+    },  # Elasticsearch
     "ecs_kubernetes": {
         "description": "Elastic Common Schema (ECS) Kubernetes audit log mappings",
         "pipeline": ecs_kubernetes(),
@@ -168,20 +171,17 @@ AVAILABLE_PIPELINES = {  # AIQ Custom
         "description": "Parse the Okta System Log event json, adjusting field-names appropriately",
         "pipeline": loki_okta_system_log(),
         "display_name": "Okta System Event",
-    },
-    # Microsoft Kusto
+    },  # Microsoft Kusto
     "microsoft_xdr": {
         "description": "Mappings for Sysmon -> XDR Advanced Hunting Query Table Schema",
         "pipeline": microsoft_xdr_pipeline(),
         "display_name": "Microsoft XDR KustoQL",
-    },
-    # Microsoft Sentinel ASIM
+    },  # Microsoft Sentinel ASIM
     "sentinel_asim": {
         "description": "Mappings for Sysmon -> Sentinel ASIM Query Table Schema",
         "pipeline": sentinel_asim_pipeline(),
         "display_name": "Sentinel ASIM KustoQL",
-    },
-    # Microsoft Azure Monitor
+    },  # Microsoft Azure Monitor
     "azure_monitor": {
         "description": "Mappings for Sysmon -> Azure Monitor Query Table Schema",
         "pipeline": azure_monitor_pipeline(),
