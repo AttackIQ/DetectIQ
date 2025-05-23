@@ -1,0 +1,21 @@
+
+# Technologies
+This project is using latest version of Python3, Langchain, OpenAI
+
+# Code Style
+I prefer SRP code.
+
+I prefer small functions and classes.
+
+I prefer logging f format strings.
+
+I prefer async code.
+
+I don't like useless comments and doc strings.
+
+I don't like default value in function parameters.
+
+I much prefer readable code.
+
+I like minimal number of public functions.
+
