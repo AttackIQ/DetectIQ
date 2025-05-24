@@ -7,6 +7,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from detectiq.core.llm.snort_rules import SnortLLM
 from detectiq.core.llm.toolkits.base import create_rule_agent
+from detectiq.core.llm.toolkits.prompts import SNORT_AGENT_PROMPT
 from detectiq.core.llm.toolkits.snort_toolkit import SnortToolkit
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS, Config
@@ -65,11 +66,11 @@ async def main():
 
     # Create a Snort Agent Executor
     snort_agent_executor = create_rule_agent(
-        rule_type="snort",
         vectorstore=snort_llm.vectordb,
         rule_creation_llm=snort_llm.rule_creation_llm,
         agent_llm=snort_llm.agent_llm,
         toolkit_class=SnortToolkit,
+        prompt=SNORT_AGENT_PROMPT,
     )
 
     # Add argument parsing

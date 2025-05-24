@@ -1,5 +1,3 @@
-# %% This example will demonstrate how to create a Sigma langchain agent chatbot, which can perform various tasks like
-# %% automatically translate a rule for you, and create new rules from a users input.
 import asyncio
 from typing import cast
 
@@ -8,6 +6,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 from detectiq.core.llm.sigma_rules import SigmaLLM
 from detectiq.core.llm.toolkits.base import create_rule_agent
+from detectiq.core.llm.toolkits.prompts import SIGMA_AGENT_PROMPT
 from detectiq.core.llm.toolkits.sigma_toolkit import SigmaToolkit
 from detectiq.core.utils.logging import get_logger
 from detectiq.globals import DEFAULT_DIRS, Config
@@ -60,11 +59,11 @@ async def main():
 
     # Create a Sigma Agent Executor
     sigma_agent_executor = create_rule_agent(
-        rule_type="sigma",
         vectorstore=sigma_llm.vectordb,
         rule_creation_llm=sigma_llm.rule_creation_llm,
         agent_llm=sigma_llm.agent_llm,
         toolkit_class=SigmaToolkit,
+        prompt=SIGMA_AGENT_PROMPT,
     )
 
     # Example prompts and operations...

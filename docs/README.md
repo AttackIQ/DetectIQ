@@ -104,6 +104,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from detectiq.core.llm.yara_rules import YaraLLM
 from detectiq.core.llm.toolkits.base import create_rule_agent
 from detectiq.core.llm.toolkits.yara_toolkit import YaraToolkit
+from detectiq.core.llm.toolkits.prompts import YARA_AGENT_PROMPT
 
 async def main():
     # Initialize LLMs
@@ -121,11 +122,11 @@ async def main():
     
     # Create agent
     yara_agent = create_rule_agent(
-        rule_type="yara",
         vectorstore=yara_llm.vectordb,
         rule_creation_llm=yara_llm.rule_creation_llm,
         agent_llm=yara_llm.agent_llm,
         toolkit_class=YaraToolkit,
+        prompt=YARA_AGENT_PROMPT,
     )
     
     # Create a rule
