@@ -1,4 +1,5 @@
 import re
+from collections import defaultdict
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -48,6 +49,10 @@ class PcapAnalyzer:
             http_data = self._extract_http_insights(self.http_analyzer.analyze(packet_list))
             anomaly_data = self._extract_anomaly_insights(self.anomaly_analyzer.analyze(packet_list))
 
+            # Extract additional network information
+            network_info = self._extract_network_info(packet_list)
+            flow_info = self._extract_flow_info(packet_list)
+
             return {
                 "key_patterns": {
                     "content": content_data["significant_patterns"],
@@ -60,6 +65,8 @@ class PcapAnalyzer:
                     "http": http_data["key_stats"],
                     "content": content_data["key_stats"],
                 },
+                "network_info": network_info,
+                "flow_info": flow_info,
                 "metadata": self._generate_minimal_metadata(packet_list),
             }
 
@@ -77,18 +84,190 @@ class PcapAnalyzer:
             logger.error(f"Error reading PCAP data: {e}")
             return []
 
+    def _extract_network_info(self, packets: List[Packet]) -> Dict[str, Any]:
+        """Extract detailed network information from packets."""
+        from scapy.layers.inet import ICMP, IP, TCP, UDP
+
+        network_info = {
+            "ip_addresses": {
+                "sources": defaultdict(int),
+                "destinations": defaultdict(int),
+                "conversations": defaultdict(int),
+            },
+            "ports": {"sources": defaultdict(int), "destinations": defaultdict(int), "services": defaultdict(int)},
+            "protocols": defaultdict(int),
+            "packet_directions": {"inbound": 0, "outbound": 0},
+        }
+
+        for packet in packets:
+            if packet.haslayer(IP):
+                ip_layer = packet[IP]
+                src_ip = ip_layer.src
+                dst_ip = ip_layer.dst
+
+                # Track IPs
+                network_info["ip_addresses"]["sources"][src_ip] += 1
+                network_info["ip_addresses"]["destinations"][dst_ip] += 1
+                network_info["ip_addresses"]["conversations"][f"{src_ip}->{dst_ip}"] += 1
+
+                # Track protocols
+                if packet.haslayer(TCP):
+                    network_info["protocols"]["TCP"] += 1
+                    tcp_layer = packet[TCP]
+                    network_info["ports"]["sources"][tcp_layer.sport] += 1
+                    network_info["ports"]["destinations"][tcp_layer.dport] += 1
+                    network_info["ports"]["services"][f"tcp/{tcp_layer.dport}"] += 1
+                elif packet.haslayer(UDP):
+                    network_info["protocols"]["UDP"] += 1
+                    udp_layer = packet[UDP]
+                    network_info["ports"]["sources"][udp_layer.sport] += 1
+                    network_info["ports"]["destinations"][udp_layer.dport] += 1
+                    network_info["ports"]["services"][f"udp/{udp_layer.dport}"] += 1
+                elif packet.haslayer(ICMP):
+                    network_info["protocols"]["ICMP"] += 1
+                else:
+                    network_info["protocols"][f"IP_PROTO_{ip_layer.proto}"] += 1
+
+        # Convert defaultdicts to regular dicts and get top entries
+        return {
+            "ip_addresses": {
+                "top_sources": dict(
+                    sorted(network_info["ip_addresses"]["sources"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+                "top_destinations": dict(
+                    sorted(network_info["ip_addresses"]["destinations"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+                "top_conversations": dict(
+                    sorted(network_info["ip_addresses"]["conversations"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+            },
+            "ports": {
+                "top_src_ports": dict(
+                    sorted(network_info["ports"]["sources"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+                "top_dst_ports": dict(
+                    sorted(network_info["ports"]["destinations"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+                "services": dict(
+                    sorted(network_info["ports"]["services"].items(), key=lambda x: x[1], reverse=True)[:10]
+                ),
+            },
+            "protocols": dict(network_info["protocols"]),
+        }
+
+    def _extract_flow_info(self, packets: List[Packet]) -> Dict[str, Any]:
+        """Extract flow-level information from packets."""
+        from scapy.layers.inet import IP, TCP, UDP
+
+        flows = defaultdict(
+            lambda: {
+                "packets": 0,
+                "bytes": 0,
+                "start_time": None,
+                "end_time": None,
+                "tcp_flags": set(),
+                "payload_sizes": [],
+            }
+        )
+
+        for packet in packets:
+            if packet.haslayer(IP):
+                ip_layer = packet[IP]
+
+                # Create flow key
+                if packet.haslayer(TCP):
+                    tcp_layer = packet[TCP]
+                    flow_key = f"{ip_layer.src}:{tcp_layer.sport}->{ip_layer.dst}:{tcp_layer.dport}/tcp"
+
+                    # Track TCP flags
+                    if tcp_layer.flags:
+                        flows[flow_key]["tcp_flags"].add(str(tcp_layer.flags))
+                elif packet.haslayer(UDP):
+                    udp_layer = packet[UDP]
+                    flow_key = f"{ip_layer.src}:{udp_layer.sport}->{ip_layer.dst}:{udp_layer.dport}/udp"
+                else:
+                    flow_key = f"{ip_layer.src}->{ip_layer.dst}/ip"
+
+                # Update flow stats
+                flow = flows[flow_key]
+                flow["packets"] += 1
+                flow["bytes"] += len(packet)
+
+                if flow["start_time"] is None:
+                    flow["start_time"] = float(packet.time)
+                flow["end_time"] = float(packet.time)
+
+                # Track payload size if present
+                if hasattr(packet, "load"):
+                    flow["payload_sizes"].append(len(packet.load))
+
+        # Process flows for output
+        processed_flows = []
+        for flow_key, flow_data in sorted(flows.items(), key=lambda x: x[1]["packets"], reverse=True)[:20]:
+            duration = flow_data["end_time"] - flow_data["start_time"] if flow_data["start_time"] else 0
+            processed_flows.append(
+                {
+                    "flow": flow_key,
+                    "packets": flow_data["packets"],
+                    "bytes": flow_data["bytes"],
+                    "duration": round(duration, 3),
+                    "tcp_flags": list(flow_data["tcp_flags"]),
+                    "avg_payload_size": (
+                        sum(flow_data["payload_sizes"]) / len(flow_data["payload_sizes"])
+                        if flow_data["payload_sizes"]
+                        else 0
+                    ),
+                }
+            )
+
+        return {"top_flows": processed_flows, "total_flows": len(flows)}
+
     def _extract_protocol_insights(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
         """Extract key protocol patterns and statistics."""
+        # Get the actual protocol data from the analyzer
+        protocols = analysis.get("protocols", {})
+        connections = analysis.get("connections", [])
+        protocol_details = analysis.get("protocol_details", {})
+
+        # Extract TCP flags from protocol details
+        tcp_flags = {}
+        if "tcp" in protocol_details:
+            tcp_data = protocol_details["tcp"]
+            tcp_flags = tcp_data.get("common_flag_combinations", {})
+
+        # Extract port patterns from connections
+        port_patterns = []
+        if connections:
+            # Get unique destination ports
+            dst_ports = {}
+            for conn in connections[:50]:  # Limit to first 50 connections
+                if ":" in conn.get("dst", ""):
+                    port = conn["dst"].split(":")[-1]
+                    proto = conn.get("proto", "unknown")
+                    port_key = f"{proto}/{port}"
+                    dst_ports[port_key] = dst_ports.get(port_key, 0) + 1
+
+            # Convert to list of top ports
+            port_patterns = [
+                {"port": k, "count": v} for k, v in sorted(dst_ports.items(), key=lambda x: x[1], reverse=True)[:10]
+            ]
+
+        # Get protocol distribution
+        protocol_dist = {}
+        for proto, stats in protocols.items():
+            protocol_dist[proto] = stats.get("count", 0)
+
         return {
             "significant_patterns": {
-                "tcp_flags": analysis.get("tcp", {}).get("common_flag_combinations", {}),
-                "port_patterns": analysis.get("port_patterns", [])[:5],
-                "protocols": analysis.get("protocol_distribution", {}),
+                "tcp_flags": tcp_flags,
+                "port_patterns": port_patterns,
+                "protocols": protocol_dist,
             },
             "key_stats": {
-                "total_connections": analysis.get("total_connections", 0),
-                "avg_packet_size": analysis.get("avg_packet_size", 0),
-                "top_protocols": list(analysis.get("protocol_distribution", {}).items())[:3],
+                "total_connections": len(connections),
+                "avg_packet_size": sum(p.get("bytes", 0) for p in protocols.values())
+                / max(sum(p.get("count", 0) for p in protocols.values()), 1),
+                "top_protocols": list(sorted(protocol_dist.items(), key=lambda x: x[1], reverse=True))[:3],
             },
         }
 
