@@ -290,16 +290,19 @@ All strings that are defined in the strings section MUST be used in the conditio
                     logger.warning("Empty agent output generated")
                     raise ValueError("Empty analysis sections in response")
 
-                # Try to compile the rule
+                error_message = ""
                 try:
                     yara.compile(source=rule_text)
                 except yara.SyntaxError as e:
                     error_message = f"Syntax Error compiling YARA rule: {str(e)}. Check for common issues like incorrect module usage (e.g., using 'is_pe' instead of 'pe.is_pe' after 'import \"pe\"') or undefined strings."
                     logger.error(error_message)
-                    raise ValueError(error_message)
                 except yara.Error as e:
-                    logger.error(f"Error compiling YARA rule: {str(e)}")
-                    raise ValueError(f"Error compiling YARA rule: {str(e)}")
+                    error_message = f"Error compiling YARA rule: {str(e)}"
+                    logger.error(error_message)
+
+                if error_message:
+                    error_message = "\n".join([f"//{line}" for line in error_message.split("\n")])
+                    rule_text = f"//{error_message}\n\n{rule_text}\n\n"
 
                 # Extract rule name for title and format it
                 rule_name_match = re.search(r"rule\s+(\w+(?:_\w+)*)\s*{", rule_text)
