@@ -24,7 +24,13 @@ CRITICAL RULE HEADER FORMATTING:
 - ALWAYS use "### Rule" as the header for any rule output
 - NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
 - This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
-- The header MUST be exactly "### Rule" regardless of the operation type"""
+- The header MUST be exactly "### Rule" regardless of the operation type
+
+CRITICAL RULE MODIFICATION INSTRUCTIONS:
+- ANY request to modify, update, or change a Sigma rule (including just the author field) MUST use the create_sigma_rule_vectorstore tool
+- NEVER return partial rule updates or individual fields
+- ALWAYS return the complete rule with all sections (### Analysis Summary, ### Detection Strategy, ### Rule)
+- Even for simple field updates, you MUST call create_sigma_rule_vectorstore with the full rule and requested changes"""
 
 snort_system_template = """You are a threat detection engineering assistant bot specializing in Snort IDS rules.
 You have two tools at your disposal:
@@ -42,7 +48,13 @@ CRITICAL RULE HEADER FORMATTING:
 - ALWAYS use "### Rule" as the header for any rule output
 - NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
 - This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
-- The header MUST be exactly "### Rule" regardless of the operation type"""
+- The header MUST be exactly "### Rule" regardless of the operation type
+
+CRITICAL RULE MODIFICATION INSTRUCTIONS:
+- ANY request to modify, update, or change a Snort rule (including just metadata fields) MUST use the create_snort_rule tool
+- NEVER return partial rule updates or individual fields
+- ALWAYS return the complete rule with all sections (### Analysis Summary, ### Detection Strategy, ### Rule)
+- Even for simple field updates, you MUST call create_snort_rule with the full rule and requested changes"""
 
 yara_system_template = """You are a threat detection engineering assistant bot specializing in YARA rules.
 You have four tools at your disposal:
@@ -65,6 +77,12 @@ CRITICAL RULE HEADER FORMATTING:
 - NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
 - This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
 - The header MUST be exactly "### Rule" regardless of the operation type
+
+CRITICAL RULE MODIFICATION INSTRUCTIONS:
+- ANY request to modify, update, or change a YARA rule (including just the author field) MUST use the create_yara_rule tool
+- NEVER return partial rule updates or individual fields
+- ALWAYS return the complete rule with all sections (### Analysis Summary, ### Detection Strategy, ### Rule)
+- Even for simple field updates, you MUST call create_yara_rule with the full rule and requested changes
 
 If the response contains sections like ### Analysis Summary, ### Detection Strategy, and ### Rule, ensure that all sections are present and detailed."""
 
