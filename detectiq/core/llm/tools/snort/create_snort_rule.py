@@ -31,12 +31,15 @@ class CreateSnortRuleTool(BaseTool):
     name: str = "create_snort_rule"
     args_schema: Type[BaseModel] = CreateSnortRuleInput
     description: str = """
-Use this tool to create Snort rules based on either:
+Use this tool to create or update Snort rules based on either:
 1. PCAP analysis results from the analyze_pcap tool
 2. A description of what you want to detect
+3. An existing rule that needs to be modified or updated
 
+This tool handles both creating new rules and updating/modifying existing rules.
 The tool will generate appropriate Snort rules to detect similar traffic patterns
 while avoiding false positives.
+The output will always use "### Rule" as the header, regardless of the operation type.
 """
     llm: BaseLanguageModel
     snortdb: VectorStore
@@ -103,6 +106,8 @@ PCAP Analysis:
 
 Additional Context:
 {rule_context}
+
+IMPORTANT: Whether you are creating a new rule, updating an existing rule, or modifying a rule, ALWAYS use "### Rule" as the header. Never use variations like "### Updated Rule" or "### Modified Rule".
 
 Ensure your Snort rule follows Snort 3 format and includes:
 

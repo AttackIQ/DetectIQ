@@ -48,9 +48,13 @@ class CreateSigmaRuleTool(BaseTool):
     """Class for creating Sigma rules based on log analysis or description"""
 
     name: str = "create_sigma_rule"
-    description: str = """Use this tool to create Sigma rules based on either:
+    description: str = """Use this tool to create or update Sigma rules based on either:
         1. Log analysis results
-        2. A description of what you want to detect"""
+        2. A description of what you want to detect
+        3. An existing rule that needs to be modified or updated
+        
+        This tool handles both creating new rules and updating/modifying existing rules.
+        The output will always use "### Rule" as the header, regardless of the operation type."""
     args_schema: Type[BaseModel] = CreateSigmaRuleInput
     llm: BaseLanguageModel
     sigmadb: Optional[VectorStore] = None

@@ -18,7 +18,13 @@ CRITICAL INSTRUCTIONS FOR TOOL OUTPUT HANDLING:
 2. DO NOT reformat, summarize, or modify the tool output in any way.
 3. Return the tool output EXACTLY as provided, maintaining all headers, sections, and formatting.
 4. If the tool output already contains the required format (with ### headers), simply pass it through unchanged.
-5. Your role is to select and call the appropriate tool, NOT to interpret or reformat its output."""
+5. Your role is to select and call the appropriate tool, NOT to interpret or reformat its output.
+
+CRITICAL RULE HEADER FORMATTING:
+- ALWAYS use "### Rule" as the header for any rule output
+- NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
+- This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
+- The header MUST be exactly "### Rule" regardless of the operation type"""
 
 snort_system_template = """You are a threat detection engineering assistant bot specializing in Snort IDS rules.
 You have two tools at your disposal:
@@ -30,7 +36,13 @@ CRITICAL INSTRUCTIONS FOR TOOL OUTPUT HANDLING:
 2. DO NOT reformat, summarize, or modify the tool output in any way.
 3. Return the tool output EXACTLY as provided, maintaining all headers, sections, and formatting.
 4. If the tool output already contains the required format (with ### headers), simply pass it through unchanged.
-5. Your role is to select and call the appropriate tool, NOT to interpret or reformat its output."""
+5. Your role is to select and call the appropriate tool, NOT to interpret or reformat its output.
+
+CRITICAL RULE HEADER FORMATTING:
+- ALWAYS use "### Rule" as the header for any rule output
+- NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
+- This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
+- The header MUST be exactly "### Rule" regardless of the operation type"""
 
 yara_system_template = """You are a threat detection engineering assistant bot specializing in YARA rules.
 You have four tools at your disposal:
@@ -48,7 +60,13 @@ CRITICAL INSTRUCTIONS FOR TOOL OUTPUT HANDLING:
 4. If the tool output already contains the required format (with ### headers), simply pass it through unchanged.
 5. Your role is to select and call the appropriate tool, NOT to interpret or reformat its output.
 
-If the response contains sections like == Analysis Summary ===, === Detection Strategy ===, and === YARA Rule ===, ensure that all sections are present and detailed."""
+CRITICAL RULE HEADER FORMATTING:
+- ALWAYS use "### Rule" as the header for any rule output
+- NEVER use variations like "### Updated Rule", "### Modified Rule", "### New Rule", etc.
+- This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
+- The header MUST be exactly "### Rule" regardless of the operation type
+
+If the response contains sections like ### Analysis Summary, ### Detection Strategy, and ### YARA Rule, ensure that all sections are present and detailed."""
 
 # Create prompts
 SIGMA_AGENT_PROMPT = ChatPromptTemplate.from_messages(

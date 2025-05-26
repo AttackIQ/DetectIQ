@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "detectiq"
-version = "0.1.44"
+version = "0.1.45"
 description = "A detection engineering workbench with LLM capabilities, including SigmaIQ features"
 authors = ["AttackIQ <rajesh.sharma@attackiq.com>"]
 readme = "README.md"

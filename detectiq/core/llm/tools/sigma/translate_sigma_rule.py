@@ -42,13 +42,13 @@ Target Backend:
 
 Provide the translation in the following format:
 
-=== Translation Summary ===
+### Translation Summary
 [Brief explanation of the translation process and any important considerations]
 
-=== Translated Query ===
+### Translated Query
 [The complete, properly formatted query for the target backend]
 
-=== Implementation Notes ===
+### Implementation Notes
 [Any important notes about:
 1. Field mappings used
 2. Backend-specific optimizations

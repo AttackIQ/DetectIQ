@@ -52,14 +52,17 @@ class CreateYaraRuleTool(BaseTool):
     name: str = "create_yara_rule"
     args_schema: Type[BaseModel] = CreateYaraRuleInput
     description: str = """
-Use this tool to create YARA rules based on either:
+Use this tool to create or update YARA rules based on either:
 1. File analysis results from the analyze_file tool
 2. A description of what you want to detect in files
+3. An existing rule that needs to be modified or updated
 
-as well as similar rules from the YARA database and/or a YARA Scaner.
+as well as similar rules from the YARA database and/or a YARA Scanner.
 
+This tool handles both creating new rules and updating/modifying existing rules.
 The tool will generate appropriate YARA rules to detect similar files
 or patterns while avoiding false positives.
+The output will always use "### Rule" as the header, regardless of the operation type.
 """
     llm: BaseLanguageModel
     yaradb: VectorStore
@@ -139,6 +142,8 @@ Conversation History:
 {chat_history_formatted}
 
 Similar and matching YARA Rules from Database: {context}
+
+IMPORTANT: Whether you are creating a new rule, updating an existing rule, or modifying a rule, ALWAYS use "### Rule" as the header. Never use variations like "### Updated Rule" or "### Modified Rule".
 
 YARA Rule Creation Guidelines:
 

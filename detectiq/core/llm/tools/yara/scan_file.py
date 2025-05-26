@@ -83,7 +83,7 @@ The input can be either a file path or file bytes.
         template = """You are a malware analyst reviewing YARA rule matches.
 Analyze the following YARA rule matches and provide a clear summary of the findings.
 
-=== MATCHING RULES ===
+### MATCHING RULES
 {matching_rules}
 
 Match Statistics:
@@ -119,10 +119,10 @@ rule high_entropy_check {{
 
 Provide an analysis in the following format:
 
-=== Summary ===
+### Summary
 [Brief overview of the matching rules and their significance]
 
-=== Detailed Analysis ===
+### Detailed Analysis
 [For each matching rule:
 1. Rule name and purpose
 2. Significance of the match
@@ -130,7 +130,7 @@ Provide an analysis in the following format:
 4. Any relevant metadata or tags
 5. Potential implications]
 
-=== Recommendations ===
+### Recommendations
 [Based on the matches:
 1. Suggested next steps
 2. Additional analysis needed

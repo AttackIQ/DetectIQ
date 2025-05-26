@@ -96,7 +96,7 @@ class AnalyzeFileTool(BaseTool):
         result = []
 
         # File Info
-        result.append("=== Basic File Information ===")
+        result.append("### Basic File Information")
         info = analysis.get("file_info", {})
         result.append(f"Size: {info.get('size', 0)} bytes")
         result.append(f"Type: {info.get('type', 'Unknown')}")
@@ -108,7 +108,7 @@ class AnalyzeFileTool(BaseTool):
 
         # String Patterns
         if string_patterns := analysis.get("string_patterns", {}):
-            result.append("\n=== String Analysis ===")
+            result.append("\n### String Analysis")
             for pattern_type, strings in string_patterns.items():
                 if strings:
                     result.append(f"\n{pattern_type.upper()} Strings:")
@@ -117,7 +117,7 @@ class AnalyzeFileTool(BaseTool):
 
         # Entropy Analysis
         if entropy_data := analysis.get("entropy"):
-            result.append("\n=== Entropy Analysis ===")
+            result.append("\n### Entropy Analysis")
             if isinstance(entropy_data, dict):
                 result.append(f"Total Entropy: {entropy_data.get('total', 0):.2f}")
                 if high_entropy := entropy_data.get("high_entropy_regions", []):
@@ -128,7 +128,7 @@ class AnalyzeFileTool(BaseTool):
         # File Structure
         if structure := analysis.get("file_structure", {}):
             if structure.get("type") != "Unknown":
-                result.append(f"\n=== {structure['type']} Analysis ===")
+                result.append(f"\n### {structure['type']} Analysis")
                 if sections := analysis.get("sections", []):
                     result.append("\nSections:")
                     for section in sections:
@@ -138,7 +138,7 @@ class AnalyzeFileTool(BaseTool):
 
         # Insights
         if insights := analysis.get("insights", []):
-            result.append("\n=== Analysis Insights ===")
+            result.append("\n### Analysis Insights")
             for insight in insights:
                 result.append(f"- {insight}")
 
