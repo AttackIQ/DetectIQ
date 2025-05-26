@@ -122,12 +122,13 @@ Ensure your Sigma rule includes:
 
 - A unique 'id' (UUID) (REQUIRED)
 - Clear 'title' and 'description' based on what you are detecting (REQUIRED)
-- Appropriate 'author', 'date', 'references', 'tags', and 'level'
+- Use 'author: DetectIQ AI' for all AI-generated rules (REQUIRED)
+- Current 'date': {current_date}
+- Appropriate 'references', 'tags', and 'level'
 - Correct 'logsource' definition
-- Add authors of any rules used as context for rule creation
 - Well-defined 'detection' section with selections and conditions
 - 'falsepositives' section listing potential false positives
-- 'related' field if similar rules are used
+- 'related' field to reference similar rules that were used as inspiration (use their IDs, not authors)
 
 Example:
 
@@ -135,13 +136,14 @@ Example:
 title: <Title of the rule>
 id: <unique UUID>
 description: <Description of the rule>
-author: <DetectIQ, and any other authors>
+author: DetectIQ AI
 date: {current_date}
 related:
-  - id: <UUID>
-    type: <derived, similar, obsolete, renamed, or merged>
+  - id: <UUID of similar rule>
+    type: similar
 references:
   - <URLs or documents>
+  - AI-generated based on community patterns
 logsource:
   category: <category>
   product: <product>

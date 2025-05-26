@@ -122,8 +122,8 @@ Ensure your Snort rule follows Snort 3 format and includes:
    - flow: Traffic direction and state
    - content: Specific patterns to match
    - pcre: Regular expressions when needed
-   - metadata: Additional information
-   - reference: CVE or other references
+   - metadata: Additional information (include "author DetectIQ AI" for AI-generated rules)
+   - reference: CVE or other references (include "AI-generated based on community patterns")
    - classtype: Attack classification
    - sid: Unique identifier
    - rev: Rule revision number
@@ -133,7 +133,7 @@ Ensure your Snort rule follows Snort 3 format and includes:
 Example Format:
 
 ```snort
-alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"MALWARE-CNC Example Trojan outbound connection"; flow:established,to_server; content:"|00 01 02 03|"; metadata:impact_flag red,policy balanced-ips drop,policy security-ips drop; reference:url,example.com/threat; classtype:trojan-activity; sid:1234567; rev:1;)  
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"MALWARE-CNC Example Trojan outbound connection"; flow:established,to_server; content:"|00 01 02 03|"; metadata:author DetectIQ AI,impact_flag red,policy balanced-ips drop,policy security-ips drop; reference:url,example.com/threat; reference:note,AI-generated based on community patterns; classtype:trojan-activity; sid:1234567; rev:1;)  
 ```
 Remember:
 1. Use the most unique and specific patterns from PCAP analysis when available

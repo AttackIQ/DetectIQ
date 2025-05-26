@@ -179,9 +179,9 @@ YARA Rule Creation Guidelines:
 
     Rule References:
         If matching or similar rules are provided, reference them in the metadata.
-        Include original authors and "DetectIQ" in the author field.
-        List rule names in the related field.
-        If no matching rules are provided, use "DetectIQ" as the author.
+        Always use "DetectIQ AI" as the author for AI-generated rules.
+        List referenced rule names in the 'related' field, not in the author field.
+        Add a reference indicating the rule was AI-generated.
 Example Valid Rule Structure:
 
 ```yara
@@ -189,16 +189,16 @@ import pe
 rule Example_Malware {{
     meta:
         description = "Detection for Example malware family"
-        author = "DetectIQ <and similar rule authors>"
+        author = "DetectIQ AI"
         date = "{current_date}"
-        reference = "URL or description"
+        reference = "AI-generated based on community patterns"
         score = <0-100>
         quality = <0-100>
         severity = <0-100>
         tags = "<FILE, MEMORY, etc.>"
         arch_context = "<x86, x64, etc.>"
         os = "<windows, linux, macos, etc.>"
-        related = "<Related Rule Names>"
+        related = "<Names of similar rules used as reference>"
     strings:
         $str1 = "suspicious string" wide
         $hex1 = {{ 90 ?? 90 }}  // Example hex pattern

@@ -66,7 +66,7 @@ CRITICAL RULE HEADER FORMATTING:
 - This applies to ALL operations: creating new rules, updating existing rules, or modifying rules
 - The header MUST be exactly "### Rule" regardless of the operation type
 
-If the response contains sections like ### Analysis Summary, ### Detection Strategy, and ### YARA Rule, ensure that all sections are present and detailed."""
+If the response contains sections like ### Analysis Summary, ### Detection Strategy, and ### Rule, ensure that all sections are present and detailed."""
 
 # Create prompts
 SIGMA_AGENT_PROMPT = ChatPromptTemplate.from_messages(
