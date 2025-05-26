@@ -216,7 +216,7 @@ You MUST provide your response in the following format, (including the '#### <se
 
 + IMPORTANT: Ensure all analysis text uses standard Markdown formatting. Use double newlines ('\n\n') between paragraphs and list items for proper rendering.
 
-#### Analysis Summary
+### Analysis Summary
 
 [Provide a detailed analysis covering:
     1. File Type and Format Analysis
@@ -224,7 +224,7 @@ You MUST provide your response in the following format, (including the '#### <se
     3. Static Features
     4. Contextual Information]
 
-#### Detection Strategy
+### Detection Strategy
 
 [Explain the detection approach, including:
     1. Pattern Selection
@@ -233,7 +233,7 @@ You MUST provide your response in the following format, (including the '#### <se
     4. Rule Optimization
     5. Limitations and Considerations]
 
-#### YARA Rule
+### Rule
 
 [Provide the YARA rule in a code block with valid syntax, e.g., 
 
@@ -268,14 +268,19 @@ All strings that are defined in the strings section MUST be used in the conditio
                     rule_text = yara_block_match.group(1).strip()
                 else:
                     # Fallback to section extraction
-                    yara_match = re.search(r"#### YARA Rule\n(.*?)(?=\n####|$)", response, re.DOTALL)
-                    if not yara_match:
-                        raise ValueError("Could not extract YARA rule from response")
-                    rule_text = yara_match.group(1).strip()
+                    yara_match = re.search(r"### Rule\n```yara\n(.*?)\n```", response, re.DOTALL)
+                    if yara_match:
+                        rule_text = yara_match.group(1).strip()
+                    else:
+                        # Try without code block
+                        yara_match = re.search(r"### Rule\n(.*?)(?=\n###|$)", response, re.DOTALL)
+                        if not yara_match:
+                            raise ValueError("Could not extract YARA rule from response")
+                        rule_text = yara_match.group(1).strip()
 
                 # Extract the analysis sections
-                analysis_summary = re.search(r"#### Analysis Summary\n(.*?)(?=\n####)", response, re.DOTALL)
-                detection_strategy = re.search(r"#### Detection Strategy\n(.*?)(?=\n####)", response, re.DOTALL)
+                analysis_summary = re.search(r"### Analysis Summary\n(.*?)(?=\n###|$)", response, re.DOTALL)
+                detection_strategy = re.search(r"### Detection Strategy\n(.*?)(?=\n###|$)", response, re.DOTALL)
 
                 if not analysis_summary or not detection_strategy:
                     logger.warning("Missing required analysis sections in response")
@@ -283,8 +288,8 @@ All strings that are defined in the strings section MUST be used in the conditio
 
                 # Combine analysis sections for agent output
                 agent_output = ""
-                agent_output += "#### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
-                agent_output += "#### Detection Strategy\n" + detection_strategy.group(1).strip()
+                agent_output += "### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
+                agent_output += "### Detection Strategy\n" + detection_strategy.group(1).strip()
 
                 if not agent_output.strip():
                     logger.warning("Empty agent output generated")
@@ -334,7 +339,8 @@ All strings that are defined in the strings section MUST be used in the conditio
                 return {
                     "rule": rule_text,
                     "agent_output": agent_output,
-                    "title": title,  # Now contains properly formatted rule name
+                    "title": title,
+                    # Now contains properly formatted rule name
                     "severity": severity,
                 }
 

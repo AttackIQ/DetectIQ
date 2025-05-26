@@ -141,7 +141,7 @@ Output Format:
 
 You MUST provide your response in the following format, using standard markdown headings:
 
-#### Analysis Summary
+### Analysis Summary
 [Provide a detailed analysis of:
 1. Network traffic patterns and protocols identified
 2. Key indicators of malicious behavior
@@ -149,7 +149,7 @@ You MUST provide your response in the following format, using standard markdown 
 4. Content patterns and their significance
 5. Protocol-specific behaviors]
 
-#### Detection Strategy
+### Detection Strategy
 [Explain in detail:
 1. Why specific detection methods were chosen
 2. How the rule options work together
@@ -161,8 +161,10 @@ You MUST provide your response in the following format, using standard markdown 
 ### Rule Description
 [Provide a clear and concise description of the rule's purpose, what it is detecting, and any other relevant details]
 
-#### Snort Rule
+### Rule
+```snort
 [Provide the Snort rule(s) following Snort 3 syntax]
+```
 """
 
             prompt = ChatPromptTemplate.from_template(template)
@@ -190,15 +192,20 @@ You MUST provide your response in the following format, using standard markdown 
                     rule_text = snort_block_match.group(1).strip()
                 else:
                     # Fallback to section extraction
-                    snort_match = re.search(r"#### Snort Rule\n(.*?)(?=\n####|$)", result, re.DOTALL)
-                    if not snort_match:
-                        raise ValueError("Could not extract Snort Rule from response")
-                    rule_text = snort_match.group(1).strip()
+                    snort_match = re.search(r"### Rule\n```snort\n(.*?)\n```", result, re.DOTALL)
+                    if snort_match:
+                        rule_text = snort_match.group(1).strip()
+                    else:
+                        # Try without code block
+                        snort_match = re.search(r"### Rule\n(.*?)(?=\n###|$)", result, re.DOTALL)
+                        if not snort_match:
+                            raise ValueError("Could not extract Snort Rule from response")
+                        rule_text = snort_match.group(1).strip()
 
                 # Extract the analysis sections
-                analysis_summary = re.search(r"#### Analysis Summary\n(.*?)(?=\n####)", result, re.DOTALL)
-                detection_strategy = re.search(r"#### Detection Strategy\n(.*?)(?=\n####)", result, re.DOTALL)
-                rule_description = re.search(r"#### Rule Description\n(.*?)(?=\n####)", result, re.DOTALL)
+                analysis_summary = re.search(r"### Analysis Summary\n(.*?)(?=\n###|$)", result, re.DOTALL)
+                detection_strategy = re.search(r"### Detection Strategy\n(.*?)(?=\n###|$)", result, re.DOTALL)
+                rule_description = re.search(r"### Rule Description\n(.*?)(?=\n###|$)", result, re.DOTALL)
 
                 if not analysis_summary or not detection_strategy:
                     logger.warning("Missing required analysis sections in response")
@@ -206,8 +213,8 @@ You MUST provide your response in the following format, using standard markdown 
 
                 # Combine analysis sections for agent output
                 agent_output = ""
-                agent_output += "#### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
-                agent_output += "#### Detection Strategy\n" + detection_strategy.group(1).strip()
+                agent_output += "### Analysis Summary\n" + analysis_summary.group(1).strip() + "\n\n"
+                agent_output += "### Detection Strategy\n" + detection_strategy.group(1).strip()
 
                 if not agent_output.strip():
                     logger.warning("Empty agent output generated")
